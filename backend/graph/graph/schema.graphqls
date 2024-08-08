@@ -1,0 +1,25 @@
+type Article {
+  id: ID!
+  title: String!
+  url: String!
+  user: User!
+  tags: [Tag!]!
+  created_at: String!
+  likes_count: Int!
+  reactions_count: Int!
+  comments_count: Int!
+}
+
+type User {
+  id: ID!
+  name: String!
+  profile_image_url: String!
+}
+
+type Tag {
+  name: String!
+}
+
+type Query {
+  articles(page: Int!, per_page: Int!): [Article!]!
+}
