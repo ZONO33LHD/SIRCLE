@@ -1,0 +1,310 @@
+syntax = "proto3";
+
+package kakeibo;
+
+option go_package = "grpc/proto;kakeibo";
+
+// カスタムスカラー型の定義
+message Date {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+}
+
+message DateTime {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+  int32 hour = 4;
+  int32 minute = 5;
+  int32 second = 6;
+}
+
+// メッセージ型の定義
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  Date birthDate = 4;
+  repeated Transaction transactions = 5;
+  repeated Budget budgets = 6;
+  repeated Goal goals = 7;
+  NotificationPreferences notificationPreferences = 8;
+}
+
+message Transaction {
+  string id = 1;
+  string userId = 2;
+  float amount = 3;
+  TransactionType type = 4;
+  Category category = 5;
+  DateTime date = 6;
+  string description = 7;
+  bool isRecurring = 8;
+  RecurringFrequency recurringFrequency = 9;
+}
+
+message Budget {
+  string id = 1;
+  string userId = 2;
+  float amount = 3;
+  Category category = 4;
+  Period period = 5;
+}
+
+message Category {
+  string id = 1;
+  string name = 2;
+  TransactionType type = 3;
+}
+
+message Goal {
+  string id = 1;
+  string userId = 2;
+  string name = 3;
+  float targetAmount = 4;
+  float currentAmount = 5;
+  Date deadline = 6;
+}
+
+message Report {
+  float totalIncome = 1;
+  float totalExpense = 2;
+  float balance = 3;
+  repeated CategoryBreakdown categoryBreakdown = 4;
+  repeated TrendPoint trends = 5;
+}
+
+message CategoryBreakdown {
+  Category category = 1;
+  float amount = 2;
+  float percentage = 3;
+}
+
+message TrendPoint {
+  Date date = 1;
+  float amount = 2;
+}
+
+message NotificationPreferences {
+  bool budgetAlerts = 1;
+  ReminderFrequency reminderFrequency = 2;
+}
+
+// 入力メッセージ型の定義
+message CreateUserInput {
+  string name = 1;
+  string email = 2;
+  Date birthDate = 3;
+}
+
+message UpdateUserInput {
+  string name = 1;
+  string email = 2;
+  Date birthDate = 3;
+}
+
+message CreateTransactionInput {
+  string userId = 1;
+  float amount = 2;
+  TransactionType type = 3;
+  string categoryId = 4;
+  DateTime date = 5;
+  string description = 6;
+  bool isRecurring = 7;
+  RecurringFrequency recurringFrequency = 8;
+}
+
+message UpdateTransactionInput {
+  float amount = 1;
+  TransactionType type = 2;
+  string categoryId = 3;
+  DateTime date = 4;
+  string description = 5;
+  bool isRecurring = 6;
+  RecurringFrequency recurringFrequency = 7;
+}
+
+message CreateBudgetInput {
+  string userId = 1;
+  float amount = 2;
+  string categoryId = 3;
+  Period period = 4;
+}
+
+message UpdateBudgetInput {
+  float amount = 1;
+  string categoryId = 2;
+  Period period = 3;
+}
+
+message CreateCategoryInput {
+  string name = 1;
+  TransactionType type = 2;
+}
+
+message UpdateCategoryInput {
+  string name = 1;
+  TransactionType type = 2;
+}
+
+message SetGoalInput {
+  string userId = 1;
+  string name = 2;
+  float targetAmount = 3;
+  Date deadline = 4;
+}
+
+message UpdateGoalInput {
+  string name = 1;
+  float targetAmount = 2;
+  float currentAmount = 3;
+  Date deadline = 4;
+}
+
+message NotificationPreferencesInput {
+  bool budgetAlerts = 1;
+  ReminderFrequency reminderFrequency = 2;
+}
+
+message TransactionFilter {
+  Date startDate = 1;
+  Date endDate = 2;
+  TransactionType type = 3;
+  string categoryId = 4;
+}
+
+// 列挙型の定義
+enum TransactionType {
+  INCOME = 0;
+  EXPENSE = 1;
+}
+
+enum Period {
+  PERIOD_MONTHLY = 0;
+  PERIOD_YEARLY = 1;
+}
+
+enum ReportType {
+  INCOME_EXPENSE = 0;
+  CATEGORY_BREAKDOWN = 1;
+  TRENDS = 2;
+}
+
+enum RecurringFrequency {
+  RECURRING_DAILY = 0;
+  RECURRING_WEEKLY = 1;
+  RECURRING_MONTHLY = 2;
+  RECURRING_YEARLY = 3;
+}
+
+enum ReminderFrequency {
+  REMINDER_DAILY = 0;
+  REMINDER_WEEKLY = 1;
+  REMINDER_MONTHLY = 2;
+}
+
+// サービスの定義
+service KakeiboService {
+  // クエリ操作
+  rpc GetUser(GetUserRequest) returns (User);
+  rpc GetTransactions(GetTransactionsRequest) returns (GetTransactionsResponse);
+  rpc GetBudgets(GetBudgetsRequest) returns (GetBudgetsResponse);
+  rpc GetReports(GetReportsRequest) returns (Report);
+  rpc GetCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
+
+  // ミューテーション操作
+  rpc CreateUser(CreateUserInput) returns (User);
+  rpc UpdateUser(UpdateUserRequest) returns (User);
+  rpc CreateTransaction(CreateTransactionInput) returns (Transaction);
+  rpc UpdateTransaction(UpdateTransactionRequest) returns (Transaction);
+  rpc DeleteTransaction(DeleteTransactionRequest) returns (DeleteTransactionResponse);
+  rpc CreateBudget(CreateBudgetInput) returns (Budget);
+  rpc UpdateBudget(UpdateBudgetRequest) returns (Budget);
+  rpc CreateCategory(CreateCategoryInput) returns (Category);
+  rpc UpdateCategory(UpdateCategoryRequest) returns (Category);
+  rpc DeleteCategory(DeleteCategoryRequest) returns (DeleteCategoryResponse);
+  rpc SetGoal(SetGoalInput) returns (Goal);
+  rpc UpdateGoal(UpdateGoalRequest) returns (Goal);
+  rpc SetNotificationPreferences(SetNotificationPreferencesRequest) returns (User);
+}
+
+// リクエストとレスポンスの定義
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetTransactionsRequest {
+  string userId = 1;
+  TransactionFilter filter = 2;
+}
+
+message GetTransactionsResponse {
+  repeated Transaction transactions = 1;
+}
+
+message GetBudgetsRequest {
+  string userId = 1;
+}
+
+message GetBudgetsResponse {
+  repeated Budget budgets = 1;
+}
+
+message GetReportsRequest {
+  string userId = 1;
+  ReportType type = 2;
+  Period period = 3;
+}
+
+message GetCategoriesRequest {}
+
+message GetCategoriesResponse {
+  repeated Category categories = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  UpdateUserInput input = 2;
+}
+
+message UpdateTransactionRequest {
+  string id = 1;
+  UpdateTransactionInput input = 2;
+}
+
+message DeleteTransactionRequest {
+  string id = 1;
+}
+
+message DeleteTransactionResponse {
+  bool success = 1;
+}
+
+message UpdateBudgetRequest {
+  string id = 1;
+  UpdateBudgetInput input = 2;
+}
+
+message UpdateCategoryRequest {
+  string id = 1;
+  UpdateCategoryInput input = 2;
+}
+
+message DeleteCategoryRequest {
+  string id = 1;
+}
+
+message DeleteCategoryResponse {
+  bool success = 1;
+}
+
+message UpdateGoalRequest {
+  string id = 1;
+  UpdateGoalInput input = 2;
+}
+
+message SetNotificationPreferencesRequest {
+  string userId = 1;
+  NotificationPreferencesInput input = 2;
+}

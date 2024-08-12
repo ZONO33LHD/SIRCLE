@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "internal/delivery/grpc/pb;user";
+
+// ユーザー情報を表すメッセージ
+message User {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    Date birthday = 4;
+    repeated Budget budgets = 5;
+    repeated Goal goals = 6;
+    NotificationPreferences notificationPreferences = 7;
+}
+
+// 予算情報を表すメッセージ
+message Budget {
+    string id = 1;
+    string userId = 2;
+    string name = 3;
+    int64 amount = 4;
+    string category = 5;
+    Date startDate = 6;
+    Date endDate = 7;
+    ReminderFrequency reminderFrequency = 8;
+}
+
+// 目標情報を表すメッセージ
+message Goal {
+    string id = 1;
+    string userId = 2;
+    string name = 3;
+    float targetAmount = 4;
+    float currentAmount = 5;
+    Date targetDate = 6;
+    ReminderFrequency reminderFrequency = 7;
+}
+
+// 通知設定を表すメッセージ
+message NotificationPreferences {
+    bool budgetNotifications = 1;
+    bool goalNotifications = 2;
+}
+
+// リマインダーの頻度を表す列挙型
+enum ReminderFrequency {
+    REMINDER_DAILY = 0;
+    REMINDER_WEEKLY = 1;
+    REMINDER_MONTHLY = 2;
+}
+
+// 日付を表すメッセージ（他のファイルから参照）
+message Date {
+    int32 year = 1;
+    int32 month = 2;
+    int32 day = 3;
+}
+
+// ユーザーサービスの定義
+service UserService {
+    // ユーザー情報を取得
+    rpc GetUser(GetUserRequest) returns (User);
+    // ユーザーを作成
+    rpc CreateUser(CreateUserRequest) returns (User);
+    // ユーザー情報を更新
+    rpc UpdateUser(UpdateUserRequest) returns (User);
+    // 予算を設定
+    rpc SetBudget(SetBudgetRequest) returns (Budget);
+    // 目標を設定
+    rpc SetGoal(SetGoalRequest) returns (Goal);
+    // 通知設定を更新
+    rpc UpdateNotificationPreferences(UpdateNotificationPreferencesRequest) returns (NotificationPreferences);
+}
+
+// 以下、各リクエストメッセージの定義
+message GetUserRequest {
+    string id = 1;
+}
+
+message CreateUserRequest {
+    string name = 1;
+    string email = 2;
+    Date birthday = 3;
+}
+
+message UpdateUserRequest {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    Date birthday = 4;
+}
+
+message SetBudgetRequest {
+    string userId = 1;
+    string name = 2;
+    int64 amount = 3;
+    string category = 4;
+    Date startDate = 5;
+    Date endDate = 6;
+    ReminderFrequency reminderFrequency = 7;
+}
+
+message SetGoalRequest {
+    string userId = 1;
+    string name = 2;
+    float targetAmount = 3;
+    Date targetDate = 4;
+    ReminderFrequency reminderFrequency = 5;
+}
+
+message UpdateNotificationPreferencesRequest {
+    string userId = 1;
+    bool budgetNotifications = 2;
+    bool goalNotifications = 3;
+}

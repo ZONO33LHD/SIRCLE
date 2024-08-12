@@ -1,0 +1,254 @@
+# カスタムスカラー型の定義
+scalar Date
+scalar DateTime
+
+# クエリ操作の定義
+type Query {
+  # 特定のユーザーを取得
+  user(id: ID!): User
+  # ユーザーの取引履歴を取得（フィルター可能）
+  transactions(userId: ID!, filter: TransactionFilter): [Transaction!]!
+  # ユーザーの予算を取得
+  budgets(userId: ID!): [Budget!]!
+  # ユーザーのレポートを生成
+  reports(userId: ID!, type: ReportType!, period: Period!): Report
+  # 全カテゴリーを取得
+  categories: [Category!]!
+}
+
+# ミューテーション操作の定義
+type Mutation {
+  # 新規ユーザーを作成
+  createUser(input: CreateUserInput!): User!
+  # ユーザー情報を更新
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  # 新規取引を作成
+  createTransaction(input: CreateTransactionInput!): Transaction!
+  # 取引情報を更新
+  updateTransaction(id: ID!, input: UpdateTransactionInput!): Transaction!
+  # 取引を削除
+  deleteTransaction(id: ID!): Boolean!
+  # 新規予算を作成
+  createBudget(input: CreateBudgetInput!): Budget!
+  # 予算を更新
+  updateBudget(id: ID!, input: UpdateBudgetInput!): Budget!
+  # 新規カテゴリーを作成
+  createCategory(input: CreateCategoryInput!): Category!
+  # カテゴリーを更新
+  updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
+  # カテゴリーを削除
+  deleteCategory(id: ID!): Boolean!
+  # 新規目標を設定
+  setGoal(input: SetGoalInput!): Goal!
+  # 目標を更新
+  updateGoal(id: ID!, input: UpdateGoalInput!): Goal!
+  # 通知設定を更新
+  setNotificationPreferences(userId: ID!, input: NotificationPreferencesInput!): User!
+}
+
+# ユーザー情報の型定義
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  birthDate: Date
+  transactions: [Transaction!]!
+  budgets: [Budget!]!
+  goals: [Goal!]!
+  notificationPreferences: NotificationPreferences!
+}
+
+# 取引情報の型定義
+type Transaction {
+  id: ID!
+  userId: ID!
+  amount: Float!
+  type: TransactionType!
+  category: Category!
+  date: DateTime!
+  description: String
+  isRecurring: Boolean!
+  recurringFrequency: RecurringFrequency
+}
+
+# 予算情報の型定義
+type Budget {
+  id: ID!
+  userId: ID!
+  amount: Float!
+  category: Category!
+  period: Period!
+}
+
+# カテゴリー情報の型定義
+type Category {
+  id: ID!
+  name: String!
+  type: TransactionType!
+}
+
+# 目標情報の型定義
+type Goal {
+  id: ID!
+  userId: ID!
+  name: String!
+  targetAmount: Float!
+  currentAmount: Float!
+  deadline: Date
+}
+
+# レポート情報の型定義
+type Report {
+  totalIncome: Float!
+  totalExpense: Float!
+  balance: Float!
+  categoryBreakdown: [CategoryBreakdown!]!
+  trends: [TrendPoint!]!
+}
+
+# カテゴリー別内訳の型定義
+type CategoryBreakdown {
+  category: Category!
+  amount: Float!
+  percentage: Float!
+}
+
+# トレンドポイントの型定義
+type TrendPoint {
+  date: Date!
+  amount: Float!
+}
+
+# 通知設定の型定義
+type NotificationPreferences {
+  budgetAlerts: Boolean!
+  reminderFrequency: ReminderFrequency!
+}
+
+# ユーザー作成入力の型定義
+input CreateUserInput {
+  name: String!
+  email: String!
+  birthDate: Date
+}
+
+# ユーザー更新入力の型定義
+input UpdateUserInput {
+  name: String
+  email: String
+  birthDate: Date
+}
+
+# 取引作成入力の型定義
+input CreateTransactionInput {
+  userId: ID!
+  amount: Float!
+  type: TransactionType!
+  categoryId: ID!
+  date: DateTime!
+  description: String
+  isRecurring: Boolean!
+  recurringFrequency: RecurringFrequency
+}
+
+# 取引更新入力の型定義
+input UpdateTransactionInput {
+  amount: Float
+  type: TransactionType
+  categoryId: ID
+  date: DateTime
+  description: String
+  isRecurring: Boolean
+  recurringFrequency: RecurringFrequency
+}
+
+# 予算作成入力の型定義
+input CreateBudgetInput {
+  userId: ID!
+  amount: Float!
+  categoryId: ID!
+  period: Period!
+}
+
+# 予算更新入力の型定義
+input UpdateBudgetInput {
+  amount: Float
+  categoryId: ID
+  period: Period
+}
+
+# カテゴリー作成入力の型定義
+input CreateCategoryInput {
+  name: String!
+  type: TransactionType!
+}
+
+# カテゴリー更新入力の型定義
+input UpdateCategoryInput {
+  name: String
+  type: TransactionType
+}
+
+# 目標設定入力の型定義
+input SetGoalInput {
+  userId: ID!
+  name: String!
+  targetAmount: Float!
+  deadline: Date
+}
+
+# 目標更新入力の型定義
+input UpdateGoalInput {
+  name: String
+  targetAmount: Float
+  currentAmount: Float
+  deadline: Date
+}
+
+# 通知設定入力の型定義
+input NotificationPreferencesInput {
+  budgetAlerts: Boolean!
+  reminderFrequency: ReminderFrequency!
+}
+
+# 取引フィルターの型定義
+input TransactionFilter {
+  startDate: Date
+  endDate: Date
+  type: TransactionType
+  categoryId: ID
+}
+
+# 取引タイプの列挙型
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+# 期間の列挙型
+enum Period {
+  MONTHLY
+  YEARLY
+}
+
+# レポートタイプの列挙型
+enum ReportType {
+  INCOME_EXPENSE
+  CATEGORY_BREAKDOWN
+  TRENDS
+}
+
+# 繰り返し頻度の列挙型
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+# リマインダー頻度の列挙型
+enum ReminderFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
