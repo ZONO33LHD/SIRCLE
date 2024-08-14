@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kakeibo-user-service
+  namespace: kakeibo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kakeibo-user-service
+  template:
+    metadata:
+      labels:
+        app: kakeibo-user-service
+    spec:
+      containers:
+        - name: kakeibo-user-service
+          image: your-registry/kakeibo-user-service:latest
+          ports:
+            - containerPort: 50051
+          env:
+            - name: DB_HOST
+              value: postgres
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-password
