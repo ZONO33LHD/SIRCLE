@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.27.2
-// source: kakeibo.proto
+// source: grpc/proto/kakeibo.proto
 
 package kakeibo
 
@@ -771,5 +771,5 @@ var KakeiboService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "kakeibo.proto",
+	Metadata: "grpc/proto/kakeibo.proto",
 }

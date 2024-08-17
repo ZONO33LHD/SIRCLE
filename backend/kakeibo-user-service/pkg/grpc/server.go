@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/internal/delivery/grpc/pb"
+	pb "github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb"
 	"google.golang.org/grpc"
 )
 

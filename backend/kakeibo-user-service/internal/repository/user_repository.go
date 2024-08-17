@@ -13,4 +13,5 @@ type UserRepository interface {
 	SetBudget(ctx context.Context, budget *model.Budget) error
 	SetGoal(ctx context.Context, goal *model.Goal) error
 	UpdateNotificationPreferences(ctx context.Context, userID string, prefs *model.NotificationPreferences) error
+	GetUserByEmail(ctx context.Context, email string) (*model.User, error)
 }

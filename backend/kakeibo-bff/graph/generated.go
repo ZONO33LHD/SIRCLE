@@ -47,6 +47,11 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AuthPayload struct {
+		Token func(childComplexity int) int
+		User  func(childComplexity int) int
+	}
+
 	Budget struct {
 		Amount   func(childComplexity int) int
 		Category func(childComplexity int) int
@@ -83,6 +88,7 @@ type ComplexityRoot struct {
 		CreateUser                 func(childComplexity int, input model.CreateUserInput) int
 		DeleteCategory             func(childComplexity int, id string) int
 		DeleteTransaction          func(childComplexity int, id string) int
+		Login                      func(childComplexity int, email string, password string) int
 		SetGoal                    func(childComplexity int, input model.SetGoalInput) int
 		SetNotificationPreferences func(childComplexity int, userID string, input model.NotificationPreferencesInput) int
 		UpdateBudget               func(childComplexity int, id string, input model.UpdateBudgetInput) int
@@ -131,7 +137,6 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		BirthDate               func(childComplexity int) int
 		Budgets                 func(childComplexity int) int
 		Email                   func(childComplexity int) int
 		Goals                   func(childComplexity int) int
@@ -156,6 +161,7 @@ type MutationResolver interface {
 	SetGoal(ctx context.Context, input model.SetGoalInput) (*model.Goal, error)
 	UpdateGoal(ctx context.Context, id string, input model.UpdateGoalInput) (*model.Goal, error)
 	SetNotificationPreferences(ctx context.Context, userID string, input model.NotificationPreferencesInput) (*model.User, error)
+	Login(ctx context.Context, email string, password string) (*model.AuthPayload, error)
 }
 type QueryResolver interface {
 	User(ctx context.Context, id string) (*model.User, error)
@@ -183,6 +189,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AuthPayload.token":
+		if e.complexity.AuthPayload.Token == nil {
+			break
+		}
+
+		return e.complexity.AuthPayload.Token(childComplexity), true
+
+	case "AuthPayload.user":
+		if e.complexity.AuthPayload.User == nil {
+			break
+		}
+
+		return e.complexity.AuthPayload.User(childComplexity), true
 
 	case "Budget.amount":
 		if e.complexity.Budget.Amount == nil {
@@ -374,6 +394,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteTransaction(childComplexity, args["id"].(string)), true
+
+	case "Mutation.login":
+		if e.complexity.Mutation.Login == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_login_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Login(childComplexity, args["email"].(string), args["password"].(string)), true
 
 	case "Mutation.setGoal":
 		if e.complexity.Mutation.SetGoal == nil {
@@ -640,13 +672,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TrendPoint.Date(childComplexity), true
 
-	case "User.birthDate":
-		if e.complexity.User.BirthDate == nil {
-			break
-		}
-
-		return e.complexity.User.BirthDate(childComplexity), true
-
 	case "User.budgets":
 		if e.complexity.User.Budgets == nil {
 			break
@@ -838,7 +863,7 @@ func (ec *executionContext) field_Mutation_createBudget_args(ctx context.Context
 	var arg0 model.CreateBudgetInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateBudgetInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCreateBudgetInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateBudgetInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCreateBudgetInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -853,7 +878,7 @@ func (ec *executionContext) field_Mutation_createCategory_args(ctx context.Conte
 	var arg0 model.CreateCategoryInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateCategoryInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCreateCategoryInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateCategoryInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCreateCategoryInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -868,7 +893,7 @@ func (ec *executionContext) field_Mutation_createTransaction_args(ctx context.Co
 	var arg0 model.CreateTransactionInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateTransactionInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCreateTransactionInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateTransactionInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCreateTransactionInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -883,7 +908,7 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	var arg0 model.CreateUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateUserInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCreateUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateUserInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCreateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -922,13 +947,37 @@ func (ec *executionContext) field_Mutation_deleteTransaction_args(ctx context.Co
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["password"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["password"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_setGoal_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.SetGoalInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNSetGoalInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐSetGoalInput(ctx, tmp)
+		arg0, err = ec.unmarshalNSetGoalInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐSetGoalInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -952,7 +1001,7 @@ func (ec *executionContext) field_Mutation_setNotificationPreferences_args(ctx c
 	var arg1 model.NotificationPreferencesInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNNotificationPreferencesInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐNotificationPreferencesInput(ctx, tmp)
+		arg1, err = ec.unmarshalNNotificationPreferencesInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐNotificationPreferencesInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -976,7 +1025,7 @@ func (ec *executionContext) field_Mutation_updateBudget_args(ctx context.Context
 	var arg1 model.UpdateBudgetInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateBudgetInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateBudgetInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateBudgetInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateBudgetInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1000,7 +1049,7 @@ func (ec *executionContext) field_Mutation_updateCategory_args(ctx context.Conte
 	var arg1 model.UpdateCategoryInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateCategoryInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateCategoryInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateCategoryInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateCategoryInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1024,7 +1073,7 @@ func (ec *executionContext) field_Mutation_updateGoal_args(ctx context.Context, 
 	var arg1 model.UpdateGoalInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateGoalInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateGoalInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateGoalInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateGoalInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1048,7 +1097,7 @@ func (ec *executionContext) field_Mutation_updateTransaction_args(ctx context.Co
 	var arg1 model.UpdateTransactionInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateTransactionInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateTransactionInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateTransactionInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateTransactionInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1072,7 +1121,7 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 	var arg1 model.UpdateUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1126,7 +1175,7 @@ func (ec *executionContext) field_Query_reports_args(ctx context.Context, rawArg
 	var arg1 model.ReportType
 	if tmp, ok := rawArgs["type"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-		arg1, err = ec.unmarshalNReportType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReportType(ctx, tmp)
+		arg1, err = ec.unmarshalNReportType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReportType(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1135,7 +1184,7 @@ func (ec *executionContext) field_Query_reports_args(ctx context.Context, rawArg
 	var arg2 model.Period
 	if tmp, ok := rawArgs["period"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("period"))
-		arg2, err = ec.unmarshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐPeriod(ctx, tmp)
+		arg2, err = ec.unmarshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐPeriod(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1159,7 +1208,7 @@ func (ec *executionContext) field_Query_transactions_args(ctx context.Context, r
 	var arg1 *model.TransactionFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg1, err = ec.unmarshalOTransactionFilter2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionFilter(ctx, tmp)
+		arg1, err = ec.unmarshalOTransactionFilter2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1220,6 +1269,110 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AuthPayload_token(ctx context.Context, field graphql.CollectedField, obj *model.AuthPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AuthPayload_token(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AuthPayload_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AuthPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AuthPayload_user(ctx context.Context, field graphql.CollectedField, obj *model.AuthPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AuthPayload_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AuthPayload_user(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AuthPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "transactions":
+				return ec.fieldContext_User_transactions(ctx, field)
+			case "budgets":
+				return ec.fieldContext_User_budgets(ctx, field)
+			case "goals":
+				return ec.fieldContext_User_goals(ctx, field)
+			case "notificationPreferences":
+				return ec.fieldContext_User_notificationPreferences(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Budget_id(ctx context.Context, field graphql.CollectedField, obj *model.Budget) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Budget_id(ctx, field)
@@ -1381,7 +1534,7 @@ func (ec *executionContext) _Budget_category(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Budget_category(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1433,7 +1586,7 @@ func (ec *executionContext) _Budget_period(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(model.Period)
 	fc.Result = res
-	return ec.marshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐPeriod(ctx, field.Selections, res)
+	return ec.marshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐPeriod(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Budget_period(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1565,7 +1718,7 @@ func (ec *executionContext) _Category_type(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(model.TransactionType)
 	fc.Result = res
-	return ec.marshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx, field.Selections, res)
+	return ec.marshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Category_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1609,7 +1762,7 @@ func (ec *executionContext) _CategoryBreakdown_category(ctx context.Context, fie
 	}
 	res := resTmp.(*model.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CategoryBreakdown_category(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2010,7 +2163,7 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2027,8 +2180,6 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_name(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "birthDate":
-				return ec.fieldContext_User_birthDate(ctx, field)
 			case "transactions":
 				return ec.fieldContext_User_transactions(ctx, field)
 			case "budgets":
@@ -2083,7 +2234,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2100,8 +2251,6 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_name(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "birthDate":
-				return ec.fieldContext_User_birthDate(ctx, field)
 			case "transactions":
 				return ec.fieldContext_User_transactions(ctx, field)
 			case "budgets":
@@ -2156,7 +2305,7 @@ func (ec *executionContext) _Mutation_createTransaction(ctx context.Context, fie
 	}
 	res := resTmp.(*model.Transaction)
 	fc.Result = res
-	return ec.marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransaction(ctx, field.Selections, res)
+	return ec.marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransaction(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createTransaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2231,7 +2380,7 @@ func (ec *executionContext) _Mutation_updateTransaction(ctx context.Context, fie
 	}
 	res := resTmp.(*model.Transaction)
 	fc.Result = res
-	return ec.marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransaction(ctx, field.Selections, res)
+	return ec.marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransaction(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateTransaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2361,7 +2510,7 @@ func (ec *executionContext) _Mutation_createBudget(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Budget)
 	fc.Result = res
-	return ec.marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐBudget(ctx, field.Selections, res)
+	return ec.marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐBudget(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createBudget(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2428,7 +2577,7 @@ func (ec *executionContext) _Mutation_updateBudget(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Budget)
 	fc.Result = res
-	return ec.marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐBudget(ctx, field.Selections, res)
+	return ec.marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐBudget(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateBudget(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2495,7 +2644,7 @@ func (ec *executionContext) _Mutation_createCategory(ctx context.Context, field 
 	}
 	res := resTmp.(*model.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2558,7 +2707,7 @@ func (ec *executionContext) _Mutation_updateCategory(ctx context.Context, field 
 	}
 	res := resTmp.(*model.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2676,7 +2825,7 @@ func (ec *executionContext) _Mutation_setGoal(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.Goal)
 	fc.Result = res
-	return ec.marshalNGoal2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐGoal(ctx, field.Selections, res)
+	return ec.marshalNGoal2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐGoal(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_setGoal(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2745,7 +2894,7 @@ func (ec *executionContext) _Mutation_updateGoal(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Goal)
 	fc.Result = res
-	return ec.marshalNGoal2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐGoal(ctx, field.Selections, res)
+	return ec.marshalNGoal2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐGoal(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateGoal(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2814,7 +2963,7 @@ func (ec *executionContext) _Mutation_setNotificationPreferences(ctx context.Con
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_setNotificationPreferences(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2831,8 +2980,6 @@ func (ec *executionContext) fieldContext_Mutation_setNotificationPreferences(ctx
 				return ec.fieldContext_User_name(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "birthDate":
-				return ec.fieldContext_User_birthDate(ctx, field)
 			case "transactions":
 				return ec.fieldContext_User_transactions(ctx, field)
 			case "budgets":
@@ -2853,6 +3000,67 @@ func (ec *executionContext) fieldContext_Mutation_setNotificationPreferences(ctx
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_setNotificationPreferences_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_login(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["email"].(string), fc.Args["password"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AuthPayload)
+	fc.Result = res
+	return ec.marshalNAuthPayload2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐAuthPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_AuthPayload_token(ctx, field)
+			case "user":
+				return ec.fieldContext_AuthPayload_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AuthPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_login_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2931,7 +3139,7 @@ func (ec *executionContext) _NotificationPreferences_reminderFrequency(ctx conte
 	}
 	res := resTmp.(model.ReminderFrequency)
 	fc.Result = res
-	return ec.marshalNReminderFrequency2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReminderFrequency(ctx, field.Selections, res)
+	return ec.marshalNReminderFrequency2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReminderFrequency(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_NotificationPreferences_reminderFrequency(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2972,7 +3180,7 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2989,8 +3197,6 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 				return ec.fieldContext_User_name(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "birthDate":
-				return ec.fieldContext_User_birthDate(ctx, field)
 			case "transactions":
 				return ec.fieldContext_User_transactions(ctx, field)
 			case "budgets":
@@ -3045,7 +3251,7 @@ func (ec *executionContext) _Query_transactions(ctx context.Context, field graph
 	}
 	res := resTmp.([]*model.Transaction)
 	fc.Result = res
-	return ec.marshalNTransaction2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionᚄ(ctx, field.Selections, res)
+	return ec.marshalNTransaction2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_transactions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3120,7 +3326,7 @@ func (ec *executionContext) _Query_budgets(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Budget)
 	fc.Result = res
-	return ec.marshalNBudget2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐBudgetᚄ(ctx, field.Selections, res)
+	return ec.marshalNBudget2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐBudgetᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_budgets(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3184,7 +3390,7 @@ func (ec *executionContext) _Query_reports(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.Report)
 	fc.Result = res
-	return ec.marshalOReport2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReport(ctx, field.Selections, res)
+	return ec.marshalOReport2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReport(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_reports(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3251,7 +3457,7 @@ func (ec *executionContext) _Query_categories(ctx context.Context, field graphql
 	}
 	res := resTmp.([]*model.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategoryᚄ(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategoryᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_categories(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3564,7 +3770,7 @@ func (ec *executionContext) _Report_categoryBreakdown(ctx context.Context, field
 	}
 	res := resTmp.([]*model.CategoryBreakdown)
 	fc.Result = res
-	return ec.marshalNCategoryBreakdown2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategoryBreakdownᚄ(ctx, field.Selections, res)
+	return ec.marshalNCategoryBreakdown2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategoryBreakdownᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Report_categoryBreakdown(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3616,7 +3822,7 @@ func (ec *executionContext) _Report_trends(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.TrendPoint)
 	fc.Result = res
-	return ec.marshalNTrendPoint2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTrendPointᚄ(ctx, field.Selections, res)
+	return ec.marshalNTrendPoint2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTrendPointᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Report_trends(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3798,7 +4004,7 @@ func (ec *executionContext) _Transaction_type(ctx context.Context, field graphql
 	}
 	res := resTmp.(model.TransactionType)
 	fc.Result = res
-	return ec.marshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx, field.Selections, res)
+	return ec.marshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Transaction_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3842,7 +4048,7 @@ func (ec *executionContext) _Transaction_category(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Transaction_category(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4020,7 +4226,7 @@ func (ec *executionContext) _Transaction_recurringFrequency(ctx context.Context,
 	}
 	res := resTmp.(*model.RecurringFrequency)
 	fc.Result = res
-	return ec.marshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐRecurringFrequency(ctx, field.Selections, res)
+	return ec.marshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐRecurringFrequency(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Transaction_recurringFrequency(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4256,47 +4462,6 @@ func (ec *executionContext) fieldContext_User_email(_ context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _User_birthDate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_birthDate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.BirthDate, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalODate2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_birthDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Date does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _User_transactions(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_transactions(ctx, field)
 	if err != nil {
@@ -4325,7 +4490,7 @@ func (ec *executionContext) _User_transactions(ctx context.Context, field graphq
 	}
 	res := resTmp.([]*model.Transaction)
 	fc.Result = res
-	return ec.marshalNTransaction2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionᚄ(ctx, field.Selections, res)
+	return ec.marshalNTransaction2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_transactions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4389,7 +4554,7 @@ func (ec *executionContext) _User_budgets(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.([]*model.Budget)
 	fc.Result = res
-	return ec.marshalNBudget2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐBudgetᚄ(ctx, field.Selections, res)
+	return ec.marshalNBudget2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐBudgetᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_budgets(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4445,7 +4610,7 @@ func (ec *executionContext) _User_goals(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.([]*model.Goal)
 	fc.Result = res
-	return ec.marshalNGoal2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐGoalᚄ(ctx, field.Selections, res)
+	return ec.marshalNGoal2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐGoalᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_goals(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4503,7 +4668,7 @@ func (ec *executionContext) _User_notificationPreferences(ctx context.Context, f
 	}
 	res := resTmp.(*model.NotificationPreferences)
 	fc.Result = res
-	return ec.marshalNNotificationPreferences2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐNotificationPreferences(ctx, field.Selections, res)
+	return ec.marshalNNotificationPreferences2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐNotificationPreferences(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_notificationPreferences(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6335,7 +6500,7 @@ func (ec *executionContext) unmarshalInputCreateBudgetInput(ctx context.Context,
 			it.CategoryID = data
 		case "period":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("period"))
-			data, err := ec.unmarshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐPeriod(ctx, v)
+			data, err := ec.unmarshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐPeriod(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6369,7 +6534,7 @@ func (ec *executionContext) unmarshalInputCreateCategoryInput(ctx context.Contex
 			it.Name = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx, v)
+			data, err := ec.unmarshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6410,7 +6575,7 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 			it.Amount = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx, v)
+			data, err := ec.unmarshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6445,7 +6610,7 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 			it.IsRecurring = data
 		case "recurringFrequency":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recurringFrequency"))
-			data, err := ec.unmarshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐRecurringFrequency(ctx, v)
+			data, err := ec.unmarshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐRecurringFrequency(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6463,7 +6628,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "email", "birthDate"}
+	fieldsInOrder := [...]string{"name", "email", "password"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6484,13 +6649,13 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.Email = data
-		case "birthDate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("birthDate"))
-			data, err := ec.unmarshalODate2ᚖstring(ctx, v)
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.BirthDate = data
+			it.Password = data
 		}
 	}
 
@@ -6520,7 +6685,7 @@ func (ec *executionContext) unmarshalInputNotificationPreferencesInput(ctx conte
 			it.BudgetAlerts = data
 		case "reminderFrequency":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reminderFrequency"))
-			data, err := ec.unmarshalNReminderFrequency2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReminderFrequency(ctx, v)
+			data, err := ec.unmarshalNReminderFrequency2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReminderFrequency(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6609,7 +6774,7 @@ func (ec *executionContext) unmarshalInputTransactionFilter(ctx context.Context,
 			it.EndDate = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx, v)
+			data, err := ec.unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6657,7 +6822,7 @@ func (ec *executionContext) unmarshalInputUpdateBudgetInput(ctx context.Context,
 			it.CategoryID = data
 		case "period":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("period"))
-			data, err := ec.unmarshalOPeriod2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐPeriod(ctx, v)
+			data, err := ec.unmarshalOPeriod2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐPeriod(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6691,7 +6856,7 @@ func (ec *executionContext) unmarshalInputUpdateCategoryInput(ctx context.Contex
 			it.Name = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx, v)
+			data, err := ec.unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6773,7 +6938,7 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 			it.Amount = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx, v)
+			data, err := ec.unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6808,7 +6973,7 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 			it.IsRecurring = data
 		case "recurringFrequency":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recurringFrequency"))
-			data, err := ec.unmarshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐRecurringFrequency(ctx, v)
+			data, err := ec.unmarshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐRecurringFrequency(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6826,7 +6991,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "email", "birthDate"}
+	fieldsInOrder := [...]string{"name", "email"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6847,13 +7012,6 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.Email = data
-		case "birthDate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("birthDate"))
-			data, err := ec.unmarshalODate2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.BirthDate = data
 		}
 	}
 
@@ -6867,6 +7025,50 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var authPayloadImplementors = []string{"AuthPayload"}
+
+func (ec *executionContext) _AuthPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AuthPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, authPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AuthPayload")
+		case "token":
+			out.Values[i] = ec._AuthPayload_token(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "user":
+			out.Values[i] = ec._AuthPayload_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var budgetImplementors = []string{"Budget"}
 
@@ -7192,6 +7394,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "setNotificationPreferences":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_setNotificationPreferences(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "login":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_login(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -7619,8 +7828,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "birthDate":
-			out.Values[i] = ec._User_birthDate(ctx, field, obj)
 		case "transactions":
 			out.Values[i] = ec._User_transactions(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7990,6 +8197,20 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAuthPayload2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐAuthPayload(ctx context.Context, sel ast.SelectionSet, v model.AuthPayload) graphql.Marshaler {
+	return ec._AuthPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAuthPayload2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐAuthPayload(ctx context.Context, sel ast.SelectionSet, v *model.AuthPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AuthPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -8005,11 +8226,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNBudget2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐBudget(ctx context.Context, sel ast.SelectionSet, v model.Budget) graphql.Marshaler {
+func (ec *executionContext) marshalNBudget2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐBudget(ctx context.Context, sel ast.SelectionSet, v model.Budget) graphql.Marshaler {
 	return ec._Budget(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNBudget2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐBudgetᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Budget) graphql.Marshaler {
+func (ec *executionContext) marshalNBudget2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐBudgetᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Budget) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8033,7 +8254,7 @@ func (ec *executionContext) marshalNBudget2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsirc
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐBudget(ctx, sel, v[i])
+			ret[i] = ec.marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐBudget(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8053,7 +8274,7 @@ func (ec *executionContext) marshalNBudget2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsirc
 	return ret
 }
 
-func (ec *executionContext) marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐBudget(ctx context.Context, sel ast.SelectionSet, v *model.Budget) graphql.Marshaler {
+func (ec *executionContext) marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐBudget(ctx context.Context, sel ast.SelectionSet, v *model.Budget) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8063,11 +8284,11 @@ func (ec *executionContext) marshalNBudget2ᚖgithubᚗcomᚋZONO33LHDᚋsircle�
 	return ec._Budget(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCategory2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v model.Category) graphql.Marshaler {
+func (ec *executionContext) marshalNCategory2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v model.Category) graphql.Marshaler {
 	return ec._Category(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCategory2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Category) graphql.Marshaler {
+func (ec *executionContext) marshalNCategory2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Category) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8091,7 +8312,7 @@ func (ec *executionContext) marshalNCategory2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsi
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategory(ctx, sel, v[i])
+			ret[i] = ec.marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8111,7 +8332,7 @@ func (ec *executionContext) marshalNCategory2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsi
 	return ret
 }
 
-func (ec *executionContext) marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
+func (ec *executionContext) marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8121,7 +8342,7 @@ func (ec *executionContext) marshalNCategory2ᚖgithubᚗcomᚋZONO33LHDᚋsircl
 	return ec._Category(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCategoryBreakdown2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategoryBreakdownᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CategoryBreakdown) graphql.Marshaler {
+func (ec *executionContext) marshalNCategoryBreakdown2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategoryBreakdownᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CategoryBreakdown) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8145,7 +8366,7 @@ func (ec *executionContext) marshalNCategoryBreakdown2ᚕᚖgithubᚗcomᚋZONO3
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCategoryBreakdown2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategoryBreakdown(ctx, sel, v[i])
+			ret[i] = ec.marshalNCategoryBreakdown2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategoryBreakdown(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8165,7 +8386,7 @@ func (ec *executionContext) marshalNCategoryBreakdown2ᚕᚖgithubᚗcomᚋZONO3
 	return ret
 }
 
-func (ec *executionContext) marshalNCategoryBreakdown2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCategoryBreakdown(ctx context.Context, sel ast.SelectionSet, v *model.CategoryBreakdown) graphql.Marshaler {
+func (ec *executionContext) marshalNCategoryBreakdown2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCategoryBreakdown(ctx context.Context, sel ast.SelectionSet, v *model.CategoryBreakdown) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8175,22 +8396,22 @@ func (ec *executionContext) marshalNCategoryBreakdown2ᚖgithubᚗcomᚋZONO33LH
 	return ec._CategoryBreakdown(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateBudgetInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCreateBudgetInput(ctx context.Context, v interface{}) (model.CreateBudgetInput, error) {
+func (ec *executionContext) unmarshalNCreateBudgetInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCreateBudgetInput(ctx context.Context, v interface{}) (model.CreateBudgetInput, error) {
 	res, err := ec.unmarshalInputCreateBudgetInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateCategoryInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCreateCategoryInput(ctx context.Context, v interface{}) (model.CreateCategoryInput, error) {
+func (ec *executionContext) unmarshalNCreateCategoryInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCreateCategoryInput(ctx context.Context, v interface{}) (model.CreateCategoryInput, error) {
 	res, err := ec.unmarshalInputCreateCategoryInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateTransactionInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCreateTransactionInput(ctx context.Context, v interface{}) (model.CreateTransactionInput, error) {
+func (ec *executionContext) unmarshalNCreateTransactionInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCreateTransactionInput(ctx context.Context, v interface{}) (model.CreateTransactionInput, error) {
 	res, err := ec.unmarshalInputCreateTransactionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
+func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
 	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -8240,11 +8461,11 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
-func (ec *executionContext) marshalNGoal2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐGoal(ctx context.Context, sel ast.SelectionSet, v model.Goal) graphql.Marshaler {
+func (ec *executionContext) marshalNGoal2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐGoal(ctx context.Context, sel ast.SelectionSet, v model.Goal) graphql.Marshaler {
 	return ec._Goal(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNGoal2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐGoalᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Goal) graphql.Marshaler {
+func (ec *executionContext) marshalNGoal2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐGoalᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Goal) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8268,7 +8489,7 @@ func (ec *executionContext) marshalNGoal2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircle
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNGoal2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐGoal(ctx, sel, v[i])
+			ret[i] = ec.marshalNGoal2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐGoal(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8288,7 +8509,7 @@ func (ec *executionContext) marshalNGoal2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircle
 	return ret
 }
 
-func (ec *executionContext) marshalNGoal2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐGoal(ctx context.Context, sel ast.SelectionSet, v *model.Goal) graphql.Marshaler {
+func (ec *executionContext) marshalNGoal2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐGoal(ctx context.Context, sel ast.SelectionSet, v *model.Goal) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8313,7 +8534,7 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNNotificationPreferences2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐNotificationPreferences(ctx context.Context, sel ast.SelectionSet, v *model.NotificationPreferences) graphql.Marshaler {
+func (ec *executionContext) marshalNNotificationPreferences2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐNotificationPreferences(ctx context.Context, sel ast.SelectionSet, v *model.NotificationPreferences) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8323,42 +8544,42 @@ func (ec *executionContext) marshalNNotificationPreferences2ᚖgithubᚗcomᚋZO
 	return ec._NotificationPreferences(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNNotificationPreferencesInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐNotificationPreferencesInput(ctx context.Context, v interface{}) (model.NotificationPreferencesInput, error) {
+func (ec *executionContext) unmarshalNNotificationPreferencesInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐNotificationPreferencesInput(ctx context.Context, v interface{}) (model.NotificationPreferencesInput, error) {
 	res, err := ec.unmarshalInputNotificationPreferencesInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐPeriod(ctx context.Context, v interface{}) (model.Period, error) {
+func (ec *executionContext) unmarshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐPeriod(ctx context.Context, v interface{}) (model.Period, error) {
 	var res model.Period
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐPeriod(ctx context.Context, sel ast.SelectionSet, v model.Period) graphql.Marshaler {
+func (ec *executionContext) marshalNPeriod2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐPeriod(ctx context.Context, sel ast.SelectionSet, v model.Period) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNReminderFrequency2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReminderFrequency(ctx context.Context, v interface{}) (model.ReminderFrequency, error) {
+func (ec *executionContext) unmarshalNReminderFrequency2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReminderFrequency(ctx context.Context, v interface{}) (model.ReminderFrequency, error) {
 	var res model.ReminderFrequency
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNReminderFrequency2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReminderFrequency(ctx context.Context, sel ast.SelectionSet, v model.ReminderFrequency) graphql.Marshaler {
+func (ec *executionContext) marshalNReminderFrequency2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReminderFrequency(ctx context.Context, sel ast.SelectionSet, v model.ReminderFrequency) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNReportType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReportType(ctx context.Context, v interface{}) (model.ReportType, error) {
+func (ec *executionContext) unmarshalNReportType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReportType(ctx context.Context, v interface{}) (model.ReportType, error) {
 	var res model.ReportType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNReportType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReportType(ctx context.Context, sel ast.SelectionSet, v model.ReportType) graphql.Marshaler {
+func (ec *executionContext) marshalNReportType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReportType(ctx context.Context, sel ast.SelectionSet, v model.ReportType) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNSetGoalInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐSetGoalInput(ctx context.Context, v interface{}) (model.SetGoalInput, error) {
+func (ec *executionContext) unmarshalNSetGoalInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐSetGoalInput(ctx context.Context, v interface{}) (model.SetGoalInput, error) {
 	res, err := ec.unmarshalInputSetGoalInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -8378,11 +8599,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNTransaction2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransaction(ctx context.Context, sel ast.SelectionSet, v model.Transaction) graphql.Marshaler {
+func (ec *executionContext) marshalNTransaction2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransaction(ctx context.Context, sel ast.SelectionSet, v model.Transaction) graphql.Marshaler {
 	return ec._Transaction(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNTransaction2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Transaction) graphql.Marshaler {
+func (ec *executionContext) marshalNTransaction2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Transaction) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8406,7 +8627,7 @@ func (ec *executionContext) marshalNTransaction2ᚕᚖgithubᚗcomᚋZONO33LHD�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransaction(ctx, sel, v[i])
+			ret[i] = ec.marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransaction(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8426,7 +8647,7 @@ func (ec *executionContext) marshalNTransaction2ᚕᚖgithubᚗcomᚋZONO33LHD�
 	return ret
 }
 
-func (ec *executionContext) marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransaction(ctx context.Context, sel ast.SelectionSet, v *model.Transaction) graphql.Marshaler {
+func (ec *executionContext) marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransaction(ctx context.Context, sel ast.SelectionSet, v *model.Transaction) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8436,17 +8657,17 @@ func (ec *executionContext) marshalNTransaction2ᚖgithubᚗcomᚋZONO33LHDᚋsi
 	return ec._Transaction(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx context.Context, v interface{}) (model.TransactionType, error) {
+func (ec *executionContext) unmarshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx context.Context, v interface{}) (model.TransactionType, error) {
 	var res model.TransactionType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx context.Context, sel ast.SelectionSet, v model.TransactionType) graphql.Marshaler {
+func (ec *executionContext) marshalNTransactionType2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx context.Context, sel ast.SelectionSet, v model.TransactionType) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNTrendPoint2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTrendPointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TrendPoint) graphql.Marshaler {
+func (ec *executionContext) marshalNTrendPoint2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTrendPointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TrendPoint) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8470,7 +8691,7 @@ func (ec *executionContext) marshalNTrendPoint2ᚕᚖgithubᚗcomᚋZONO33LHDᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTrendPoint2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTrendPoint(ctx, sel, v[i])
+			ret[i] = ec.marshalNTrendPoint2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTrendPoint(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8490,7 +8711,7 @@ func (ec *executionContext) marshalNTrendPoint2ᚕᚖgithubᚗcomᚋZONO33LHDᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNTrendPoint2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTrendPoint(ctx context.Context, sel ast.SelectionSet, v *model.TrendPoint) graphql.Marshaler {
+func (ec *executionContext) marshalNTrendPoint2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTrendPoint(ctx context.Context, sel ast.SelectionSet, v *model.TrendPoint) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8500,36 +8721,36 @@ func (ec *executionContext) marshalNTrendPoint2ᚖgithubᚗcomᚋZONO33LHDᚋsir
 	return ec._TrendPoint(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateBudgetInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateBudgetInput(ctx context.Context, v interface{}) (model.UpdateBudgetInput, error) {
+func (ec *executionContext) unmarshalNUpdateBudgetInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateBudgetInput(ctx context.Context, v interface{}) (model.UpdateBudgetInput, error) {
 	res, err := ec.unmarshalInputUpdateBudgetInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateCategoryInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateCategoryInput(ctx context.Context, v interface{}) (model.UpdateCategoryInput, error) {
+func (ec *executionContext) unmarshalNUpdateCategoryInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateCategoryInput(ctx context.Context, v interface{}) (model.UpdateCategoryInput, error) {
 	res, err := ec.unmarshalInputUpdateCategoryInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateGoalInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateGoalInput(ctx context.Context, v interface{}) (model.UpdateGoalInput, error) {
+func (ec *executionContext) unmarshalNUpdateGoalInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateGoalInput(ctx context.Context, v interface{}) (model.UpdateGoalInput, error) {
 	res, err := ec.unmarshalInputUpdateGoalInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateTransactionInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateTransactionInput(ctx context.Context, v interface{}) (model.UpdateTransactionInput, error) {
+func (ec *executionContext) unmarshalNUpdateTransactionInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateTransactionInput(ctx context.Context, v interface{}) (model.UpdateTransactionInput, error) {
 	res, err := ec.unmarshalInputUpdateTransactionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
 	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUser2githubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8882,7 +9103,7 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalOPeriod2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐPeriod(ctx context.Context, v interface{}) (*model.Period, error) {
+func (ec *executionContext) unmarshalOPeriod2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐPeriod(ctx context.Context, v interface{}) (*model.Period, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -8891,14 +9112,14 @@ func (ec *executionContext) unmarshalOPeriod2ᚖgithubᚗcomᚋZONO33LHDᚋsircl
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOPeriod2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐPeriod(ctx context.Context, sel ast.SelectionSet, v *model.Period) graphql.Marshaler {
+func (ec *executionContext) marshalOPeriod2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐPeriod(ctx context.Context, sel ast.SelectionSet, v *model.Period) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐRecurringFrequency(ctx context.Context, v interface{}) (*model.RecurringFrequency, error) {
+func (ec *executionContext) unmarshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐRecurringFrequency(ctx context.Context, v interface{}) (*model.RecurringFrequency, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -8907,14 +9128,14 @@ func (ec *executionContext) unmarshalORecurringFrequency2ᚖgithubᚗcomᚋZONO3
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐRecurringFrequency(ctx context.Context, sel ast.SelectionSet, v *model.RecurringFrequency) graphql.Marshaler {
+func (ec *executionContext) marshalORecurringFrequency2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐRecurringFrequency(ctx context.Context, sel ast.SelectionSet, v *model.RecurringFrequency) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOReport2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐReport(ctx context.Context, sel ast.SelectionSet, v *model.Report) graphql.Marshaler {
+func (ec *executionContext) marshalOReport2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐReport(ctx context.Context, sel ast.SelectionSet, v *model.Report) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -8937,7 +9158,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalOTransactionFilter2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionFilter(ctx context.Context, v interface{}) (*model.TransactionFilter, error) {
+func (ec *executionContext) unmarshalOTransactionFilter2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionFilter(ctx context.Context, v interface{}) (*model.TransactionFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -8945,7 +9166,7 @@ func (ec *executionContext) unmarshalOTransactionFilter2ᚖgithubᚗcomᚋZONO33
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx context.Context, v interface{}) (*model.TransactionType, error) {
+func (ec *executionContext) unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx context.Context, v interface{}) (*model.TransactionType, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -8954,14 +9175,14 @@ func (ec *executionContext) unmarshalOTransactionType2ᚖgithubᚗcomᚋZONO33LH
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐTransactionType(ctx context.Context, sel ast.SelectionSet, v *model.TransactionType) graphql.Marshaler {
+func (ec *executionContext) marshalOTransactionType2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐTransactionType(ctx context.Context, sel ast.SelectionSet, v *model.TransactionType) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

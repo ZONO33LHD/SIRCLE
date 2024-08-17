@@ -1,10 +1,14 @@
 module github.com/ZONO33LHD/sircle/backend/kakeibo-bff
 
-go 1.22.0
+go 1.23.0
 
 require (
 	github.com/99designs/gqlgen v0.17.49
+	github.com/ZONO33LHD/sircle/backend/kakeibo-user-service v0.0.0
+	github.com/rs/cors v1.11.0
 	github.com/vektah/gqlparser/v2 v2.5.16
+	google.golang.org/grpc v1.65.0
+	google.golang.org/protobuf v1.34.2
 )
 
 require (
@@ -24,8 +28,11 @@ require (
 	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
-	google.golang.org/grpc v1.65.0 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240604185151-ef581f913117 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+replace (
+	github.com/ZONO33LHD/sircle/backend/kakeibo-user-service => ../kakeibo-user-service
+	github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb => ../kakeibo-user-service/pkg/grpc/pb
 )

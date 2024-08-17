@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package kakeibo;
 
-option go_package = "grpc/proto;kakeibo";
+option go_package = ".;kakeibo";
 
 // カスタムスカラー型の定義
 message Date {
@@ -25,11 +25,10 @@ message User {
   string id = 1;
   string name = 2;
   string email = 3;
-  Date birthDate = 4;
-  repeated Transaction transactions = 5;
-  repeated Budget budgets = 6;
-  repeated Goal goals = 7;
-  NotificationPreferences notificationPreferences = 8;
+  repeated Transaction transactions = 4;
+  repeated Budget budgets = 5;
+  repeated Goal goals = 6;
+  NotificationPreferences notificationPreferences = 7;
 }
 
 message Transaction {
@@ -95,13 +94,12 @@ message NotificationPreferences {
 message CreateUserInput {
   string name = 1;
   string email = 2;
-  Date birthDate = 3;
+  string password = 3;
 }
 
 message UpdateUserInput {
   string name = 1;
   string email = 2;
-  Date birthDate = 3;
 }
 
 message CreateTransactionInput {

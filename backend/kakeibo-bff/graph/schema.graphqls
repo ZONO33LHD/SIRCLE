@@ -44,6 +44,8 @@ type Mutation {
   updateGoal(id: ID!, input: UpdateGoalInput!): Goal!
   # 通知設定を更新
   setNotificationPreferences(userId: ID!, input: NotificationPreferencesInput!): User!
+  # ログイン
+  login(email: String!, password: String!): AuthPayload!
 }
 
 # ユーザー情報の型定義
@@ -51,7 +53,6 @@ type User {
   id: ID!
   name: String!
   email: String!
-  birthDate: Date
   transactions: [Transaction!]!
   budgets: [Budget!]!
   goals: [Goal!]!
@@ -129,14 +130,13 @@ type NotificationPreferences {
 input CreateUserInput {
   name: String!
   email: String!
-  birthDate: Date
+  password: String!
 }
 
 # ユーザー更新入力の型定義
 input UpdateUserInput {
   name: String
   email: String
-  birthDate: Date
 }
 
 # 取引作成入力の型定義
@@ -251,4 +251,10 @@ enum ReminderFrequency {
   DAILY
   WEEKLY
   MONTHLY
+}
+
+# 認証ペイロードの型定義
+type AuthPayload {
+  token: String!
+  user: User!
 }

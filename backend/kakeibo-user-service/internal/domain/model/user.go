@@ -3,34 +3,34 @@ package model
 import "time"
 
 type User struct {
-	ID                      string
-	Name                    string
-	Email                   string
-	Birthday                time.Time
-	Budgets                 []Budget
-	Goals                   []Goal
-	NotificationPreferences NotificationPreferences
+	ID                      int                      `json:"id"`
+	Name                    string                   `json:"name"`
+	Email                   string                   `json:"email"`
+	PasswordHash            string                   `json:"-"`
+	NotificationPreferences *NotificationPreferences `json:"notification_preferences"`
+	CreatedAt               time.Time                `json:"created_at"`
+	UpdatedAt               time.Time                `json:"updated_at"`
 }
 
 type Budget struct {
-	ID                 string
-	UserID             string
-	Name               string
-	Amount             int64
-	Category           string
-	StartDate          time.Time
-	EndDate            time.Time
-	ReminderFrequency  ReminderFrequency
+	ID                string
+	UserID            string
+	Name              string
+	Amount            int64
+	Category          string
+	StartDate         time.Time
+	EndDate           time.Time
+	ReminderFrequency ReminderFrequency
 }
 
 type Goal struct {
-	ID                 string
-	UserID             string
-	Name               string
-	TargetAmount       float64
-	CurrentAmount      float64
-	TargetDate         time.Time
-	ReminderFrequency  ReminderFrequency
+	ID                string
+	UserID            string
+	Name              string
+	TargetAmount      float64
+	CurrentAmount     float64
+	TargetDate        time.Time
+	ReminderFrequency ReminderFrequency
 }
 
 type NotificationPreferences struct {

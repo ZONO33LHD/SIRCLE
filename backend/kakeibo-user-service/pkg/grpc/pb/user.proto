@@ -2,14 +2,14 @@ syntax = "proto3";
 
 package user;
 
-option go_package = "internal/delivery/grpc/pb;user";
+option go_package = ".;pb";
 
 // ユーザー情報を表すメッセージ
 message User {
     string id = 1;
     string name = 2;
     string email = 3;
-    Date birthday = 4;
+    string password = 4;
     repeated Budget budgets = 5;
     repeated Goal goals = 6;
     NotificationPreferences notificationPreferences = 7;
@@ -58,6 +58,16 @@ message Date {
     int32 day = 3;
 }
 
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    User user = 1;
+    string token = 2;
+}
+
 // ユーザーサービスの定義
 service UserService {
     // ユーザー情報を取得
@@ -72,6 +82,7 @@ service UserService {
     rpc SetGoal(SetGoalRequest) returns (Goal);
     // 通知設定を更新
     rpc UpdateNotificationPreferences(UpdateNotificationPreferencesRequest) returns (NotificationPreferences);
+    rpc Login(LoginRequest) returns (LoginResponse) {};
 }
 
 // 以下、各リクエストメッセージの定義
@@ -82,14 +93,13 @@ message GetUserRequest {
 message CreateUserRequest {
     string name = 1;
     string email = 2;
-    Date birthday = 3;
+    string password = 3;
 }
 
 message UpdateUserRequest {
     string id = 1;
     string name = 2;
     string email = 3;
-    Date birthday = 4;
 }
 
 message SetBudgetRequest {
@@ -115,3 +125,4 @@ message UpdateNotificationPreferencesRequest {
     bool budgetNotifications = 2;
     bool goalNotifications = 3;
 }
+

@@ -7,13 +7,40 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-bff/graph/model"
+	"github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+	log.Printf("CreateUser called with input: %+v", input)
+	log.Printf("UserServiceClient: %+v", r.UserServiceClient)
+
+	resp, err := r.UserServiceClient.CreateUser(ctx, &pb.CreateUserRequest{
+		Name:  input.Name,
+		Email: input.Email,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create user: %v", err)
+	}
+	notificationPreferences := &model.NotificationPreferences{
+		BudgetAlerts: false,
+	}
+
+	if resp.NotificationPreferences != nil {
+		notificationPreferences.BudgetAlerts = resp.NotificationPreferences.BudgetNotifications
+	}
+
+	return &model.User{
+		ID:                      resp.Id,
+		Name:                    resp.Name,
+		Email:                   resp.Email,
+		Budgets:                 []*model.Budget{},
+		Goals:                   []*model.Goal{},
+		NotificationPreferences: notificationPreferences,
+	}, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.
@@ -74,6 +101,26 @@ func (r *mutationResolver) UpdateGoal(ctx context.Context, id string, input mode
 // SetNotificationPreferences is the resolver for the setNotificationPreferences field.
 func (r *mutationResolver) SetNotificationPreferences(ctx context.Context, userID string, input model.NotificationPreferencesInput) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: SetNotificationPreferences - setNotificationPreferences"))
+}
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.AuthPayload, error) {
+	resp, err := r.UserServiceClient.Login(ctx, &pb.LoginRequest{
+		Email:    email,
+		Password: password,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.AuthPayload{
+		Token: resp.Token,
+		User: &model.User{
+			ID:    resp.User.Id,
+			Name:  resp.User.Name,
+			Email: resp.User.Email,
+		},
+	}, nil
 }
 
 // User is the resolver for the user field.

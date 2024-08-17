@@ -8,6 +8,11 @@ import (
 	"strconv"
 )
 
+type AuthPayload struct {
+	Token string `json:"token"`
+	User  *User  `json:"user"`
+}
+
 type Budget struct {
 	ID       string    `json:"id"`
 	UserID   string    `json:"userId"`
@@ -52,9 +57,9 @@ type CreateTransactionInput struct {
 }
 
 type CreateUserInput struct {
-	Name      string  `json:"name"`
-	Email     string  `json:"email"`
-	BirthDate *string `json:"birthDate,omitempty"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type Goal struct {
@@ -150,16 +155,14 @@ type UpdateTransactionInput struct {
 }
 
 type UpdateUserInput struct {
-	Name      *string `json:"name,omitempty"`
-	Email     *string `json:"email,omitempty"`
-	BirthDate *string `json:"birthDate,omitempty"`
+	Name  *string `json:"name,omitempty"`
+	Email *string `json:"email,omitempty"`
 }
 
 type User struct {
 	ID                      string                   `json:"id"`
 	Name                    string                   `json:"name"`
 	Email                   string                   `json:"email"`
-	BirthDate               *string                  `json:"birthDate,omitempty"`
 	Transactions            []*Transaction           `json:"transactions"`
 	Budgets                 []*Budget                `json:"budgets"`
 	Goals                   []*Goal                  `json:"goals"`
