@@ -16,9 +16,8 @@ import { IoHomeOutline } from 'react-icons/io5';
 
 export default function SideBar() {
   return (
-    <div className="flex h-full w-40 flex-col bg-gray-100">
-      <div className="flex-1 p-4">
-        <h1 className="mb-4 text-xl font-bold">SIRCLE</h1>
+    <div className="flex h-full w-40 flex-col bg-white">
+      <div className="flex-1 pl-5 pr-5 pt-8">
         <nav className="space-y-2">
           <Link href="/" className="flex items-center px-4 py-2 hover:bg-gray-200">
             <IoHomeOutline className="mr-2 text-xl" />

@@ -7,10 +7,12 @@ import (
 
 type Resolver struct{
 	UserServiceClient pb.UserServiceClient
+	TransactionServiceClient pb.TransactionServiceClient
 }
 
 func NewResolver(conn *grpc.ClientConn) *Resolver {
 	return &Resolver{
 		UserServiceClient: pb.NewUserServiceClient(conn),
+		TransactionServiceClient: pb.NewTransactionServiceClient(conn),
 	}
 }

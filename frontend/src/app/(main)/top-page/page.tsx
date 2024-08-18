@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import IncomeExpenseSummary from '../../../components/IncomeExpenseSummary';
-import IncomeExpenseForm from '../../../components/BalanceForm';
+import TransactionForm from '../../../components/TransactionForm';
 import FinancialAnalysis from '../../../components/FinancialAnalysis';
 
 export default function Page() {
@@ -9,7 +9,7 @@ export default function Page() {
     <div className="container mx-auto p-4">
       <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
         <IncomeExpenseSummary />
-        <IncomeExpenseForm />
+        <TransactionForm />
       </div>
       <FinancialAnalysis />
     </div>

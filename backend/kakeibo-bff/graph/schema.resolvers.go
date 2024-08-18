@@ -47,7 +47,31 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 
 // CreateTransaction is the resolver for the createTransaction field.
 func (r *mutationResolver) CreateTransaction(ctx context.Context, input model.CreateTransactionInput) (*model.Transaction, error) {
-	panic(fmt.Errorf("not implemented: CreateTransaction - createTransaction"))
+	resp, err := r.TransactionServiceClient.CreateTransaction(ctx, &pb.CreateTransactionRequest{
+		UserId:      input.UserID,
+		Amount:      float32(input.Amount),
+		Type:        input.Type,
+		CategoryId:  input.CategoryID,
+		Date:        input.Date,
+		Description: input.Description,
+		IsRecurring: input.IsRecurring,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("取引の作成に失敗しました: %v", err)
+	}
+
+	return &model.Transaction{
+		ID:     resp.Id,
+		Amount: float64(resp.Amount),
+		Type:   resp.Type,
+		Category: &model.Category{
+			ID:   resp.Category.Id,
+			Name: resp.Category.Name,
+		},
+		Date:        resp.Date,
+		Description: resp.Description,
+		IsRecurring: resp.IsRecurring,
+	}, nil
 }
 
 // UpdateTransaction is the resolver for the updateTransaction field.

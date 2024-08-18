@@ -68,6 +68,32 @@ message LoginResponse {
     string token = 2;
 }
 
+// 取引情報を表すメッセージ
+message Transaction {
+    string id = 1;
+    string userId = 2;
+    float amount = 3;
+    string type = 4;
+    string categoryId = 5;
+    string date = 6;
+    string description = 7;
+    bool isRecurring = 8;
+}
+
+message CreateTransactionRequest {
+    string userId = 1;
+    float amount = 2;
+    string type = 3;
+    string categoryId = 4;
+    string date = 5;
+    string description = 6;
+    bool isRecurring = 7;
+}
+
+message CreateTransactionResponse {
+    Transaction transaction = 1;
+}
+
 // ユーザーサービスの定義
 service UserService {
     // ユーザー情報を取得
