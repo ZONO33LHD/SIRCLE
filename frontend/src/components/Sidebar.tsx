@@ -33,7 +33,7 @@ export default function SideBar() {
             <IoSettingsOutline className="mr-2 text-xl" />
             <span>Settings</span>
           </Link>
-          <Link href="/logout" className="flex items-center px-4 py-2 hover:bg-gray-200">
+          <Link href="/login" className="flex items-center px-4 py-2 hover:bg-gray-200">
             <VscSignOut className="mr-2 text-xl" />
             <span>Logout</span>
           </Link>

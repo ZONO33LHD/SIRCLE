@@ -92,3 +92,19 @@ TypeScript, Nextjs, Go, GraphQL, gRPCを使用したアプリケーションを�
 ### 認証
 - Firebaseを使用する
 - ログインは、Google,X,LINEで認証する
+
+
+## システム構成図
+```mermaid
+graph TD;
+    A[クライアント] -->|HTTP/HTTPS| B(ロードバランサー);
+    B --> C{API Gateway / BFF};
+    C -->|gRPC| D[認証サービス];
+    C -->|gRPC| E[ユーザーサービス];
+    C -->|gRPC| F[取引サービス];
+    C -->|gRPC| G[レポートサービス];
+    D --> H[(認証DB)];
+    E --> I[(ユーザーDB)];
+    F --> J[(取引DB)];
+    G --> K[(レポートDB)];
+```
