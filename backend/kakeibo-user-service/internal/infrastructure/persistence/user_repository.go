@@ -115,16 +115,23 @@ func (r *UserRepositoryImpl) UpdateNotificationPreferences(ctx context.Context, 
 }
 
 func (r *UserRepositoryImpl) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
-	query := `SELECT id, name, email, budgets, goals, notification_preferences FROM users WHERE email = $1`
+	query := `SELECT id, name, email, password_hash, notification_preferences FROM users WHERE email = $1`
 	var user model.User
-	var budgetsJSON, goalsJSON, prefsJSON []byte
+	var prefsJSON []byte
 
 	err := r.db.QueryRowContext(ctx, query, email).Scan(
-		&user.ID, &user.Name, &user.Email,
-		&budgetsJSON, &goalsJSON, &prefsJSON,
+		&user.ID, &user.Name, &user.Email, &user.PasswordHash, &prefsJSON,
 	)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
 		return nil, err
+	}
+
+	err = json.Unmarshal(prefsJSON, &user.NotificationPreferences)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal notification preferences: %w", err)
 	}
 
 	return &user, nil

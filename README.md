@@ -91,5 +91,4 @@ TypeScript, Nextjs, Go, GraphQL, gRPCを使用したアプリケーションを�
 
 ### 認証
 - Firebaseを使用する
-- ログインは、Google,Xで認証する
-
+- ログインは、Google,X,LINEで認証する

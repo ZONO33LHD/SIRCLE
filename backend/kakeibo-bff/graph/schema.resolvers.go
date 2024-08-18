@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-bff/graph/model"
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb"
@@ -15,12 +14,10 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	log.Printf("CreateUser called with input: %+v", input)
-	log.Printf("UserServiceClient: %+v", r.UserServiceClient)
-
 	resp, err := r.UserServiceClient.CreateUser(ctx, &pb.CreateUserRequest{
-		Name:  input.Name,
-		Email: input.Email,
+		Name:     input.Name,
+		Email:    input.Email,
+		Password: input.Password,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user: %v", err)

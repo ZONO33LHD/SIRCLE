@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/internal/domain/model"
@@ -33,7 +34,10 @@ func (s *UserService) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.
 }
 
 func (s *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+
+	trimmedPassword := strings.TrimSpace(req.Password)
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(trimmedPassword), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "パスワードのハッシュ化に失敗しました: %v", err)
 	}
@@ -41,7 +45,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	user := &model.User{
 		Name:         req.Name,
 		Email:        req.Email,
-		PasswordHash: string(hashedPassword),
+		PasswordHash: hashedPassword,
 		NotificationPreferences: &model.NotificationPreferences{
 			BudgetNotifications: false,
 			GoalNotifications:   false,
@@ -51,6 +55,14 @@ func (s *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	err = s.userRepo.CreateUser(ctx, user)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "ユーザーの作成に失敗しました: %v", err)
+	}
+
+	// ユーザー情報を再取得して確認
+	createdUser, err := s.userRepo.GetUserByEmail(ctx, user.Email)
+	if err != nil {
+		log.Printf("作成したユーザーの取得に失敗: %v", err)
+	} else {
+		log.Printf("作成したユーザーのハッシュ: %s", string(createdUser.PasswordHash))
 	}
 
 	return &pb.User{
@@ -85,23 +97,30 @@ func (s *UserService) UpdateNotificationPreferences(ctx context.Context, req *pb
 }
 
 func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	log.Printf("Login called with email: %s", req.Email)
 	user, err := s.userRepo.GetUserByEmail(ctx, req.Email)
-	log.Printf("GetUserByEmail result: %+v", user)
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "ユーザーが見つかりません")
+		log.Printf("ユーザー取得エラー: %v", err)
+		return nil, status.Errorf(codes.Unauthenticated, "認証に失敗しました")
 	}
 
-	// パスワードの比較
-	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password))
+	trimmedPassword := strings.TrimSpace(req.Password)
+
+	err = bcrypt.CompareHashAndPassword(user.PasswordHash, []byte(trimmedPassword))
+	log.Printf("Login - パスワード比較結果: %v", err)
+
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "無効なパスワードです")
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			log.Printf("パスワード不一致: %v", err)
+			return nil, status.Errorf(codes.Unauthenticated, "認証に失敗しました")
+		}
+		log.Printf("パスワード比較エラー: %v", err)
+		return nil, status.Errorf(codes.Internal, "認証処理中にエラーが発生しました")
 	}
 
 	// JWTトークンの生成
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+		"exp":     time.Now().Add(time.Minute * 30).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

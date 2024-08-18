@@ -9,10 +9,11 @@
 
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useMutation, gql } from '@apollo/client';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLine, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 
 const LOGIN_MUTATION = gql`
   mutation Login($email: String!, $password: String!) {
@@ -30,13 +31,14 @@ const LOGIN_MUTATION = gql`
 export default function Login() {
   const [login] = useMutation(LOGIN_MUTATION);
   const { register, handleSubmit } = useForm();
+  const router = useRouter();
   const onSubmit = async (data: any) => {
     try {
       const result = await login({ variables: { email: data.email, password: data.password } });
       const { token, user } = result.data.login;
       localStorage.setItem('token', token);
       // ユーザーをリダイレクトする
-      redirect('/');
+      router.push('/top-page');
     } catch (error) {
       console.error('Login failed:', error);
       // エラーメッセージを表示する
@@ -96,11 +98,11 @@ export default function Login() {
             </Link>
           </div>
           <div className="mt-8 flex justify-center space-x-4">
-            <Link href="#" className="text-black hover:text-blue-500">
-              <Image src="/twitter-icon.png" alt="X" width={28} height={28} />
+          <Link href="#" className="text-black hover:text-blue-700">
+              <FontAwesomeIcon icon={faXTwitter} size="2x" />
             </Link>
             <Link href="#" className="text-green-500 hover:text-green-700">
-              <Image src="/line-icon.png" alt="LINE" width={28} height={28} />
+              <FontAwesomeIcon icon={faLine} size="2x" />
             </Link>
           </div>
         </div>
