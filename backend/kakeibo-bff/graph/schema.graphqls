@@ -145,6 +145,7 @@ input CreateTransactionInput {
   amount: Float!
   type: TransactionType!
   categoryId: ID!
+  categoryName: String!
   date: DateTime!
   description: String
   isRecurring: Boolean!

@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-bff/graph/model"
+	transactionpb "github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/pkg/grpc/pb"
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb"
 )
 
@@ -47,13 +48,13 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 
 // CreateTransaction is the resolver for the createTransaction field.
 func (r *mutationResolver) CreateTransaction(ctx context.Context, input model.CreateTransactionInput) (*model.Transaction, error) {
-	resp, err := r.TransactionServiceClient.CreateTransaction(ctx, &pb.CreateTransactionRequest{
+	resp, err := r.TransactionServiceClient.CreateTransaction(ctx, &transactionpb.CreateTransactionRequest{
 		UserId:      input.UserID,
 		Amount:      float32(input.Amount),
-		Type:        input.Type,
+		Type:        string(input.Type),
 		CategoryId:  input.CategoryID,
 		Date:        input.Date,
-		Description: input.Description,
+		Description: *input.Description,
 		IsRecurring: input.IsRecurring,
 	})
 	if err != nil {
@@ -61,16 +62,16 @@ func (r *mutationResolver) CreateTransaction(ctx context.Context, input model.Cr
 	}
 
 	return &model.Transaction{
-		ID:     resp.Id,
-		Amount: float64(resp.Amount),
-		Type:   resp.Type,
+		ID:     resp.Transaction.Id,
+		Amount: float64(resp.Transaction.Amount),
+		Type:   model.TransactionType(resp.Transaction.Type),
 		Category: &model.Category{
-			ID:   resp.Category.Id,
-			Name: resp.Category.Name,
+			ID:   resp.Transaction.CategoryId,
+			Name: resp.Transaction.CategoryName,
 		},
-		Date:        resp.Date,
-		Description: resp.Description,
-		IsRecurring: resp.IsRecurring,
+		Date:        resp.Transaction.Date,
+		Description: &resp.Transaction.Description,
+		IsRecurring: resp.Transaction.IsRecurring,
 	}, nil
 }
 

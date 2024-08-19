@@ -11,9 +11,10 @@ message Transaction {
     float amount = 3;
     string type = 4;
     string categoryId = 5;
-    string date = 6;
-    string description = 7;
-    bool isRecurring = 8;
+    string categoryName = 6;
+    string date = 7;
+    string description = 8;
+    bool isRecurring = 9;
 }
 
 message CreateTransactionRequest {
@@ -21,17 +22,28 @@ message CreateTransactionRequest {
     float amount = 2;
     string type = 3;
     string categoryId = 4;
-    string date = 5;
-    string description = 6;
-    bool isRecurring = 7;
+    string categoryName = 5;
+    string date = 6;
+    string description = 7;
+    bool isRecurring = 8;
 }
 
 message CreateTransactionResponse {
     Transaction transaction = 1;
 }
 
+message DeleteTransactionRequest {
+    string id = 1;
+}
+
+message DeleteTransactionResponse {
+    bool success = 1;
+}
+
 // 取引サービスの定義
 service TransactionService {
     // 取引を作成
     rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse);
+    // 取引を削除
+    rpc DeleteTransaction(DeleteTransactionRequest) returns (DeleteTransactionResponse);
 }

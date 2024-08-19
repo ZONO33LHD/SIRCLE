@@ -37,13 +37,11 @@ export default function Login() {
       const result = await login({ variables: { email: data.email, password: data.password } });
       const { token, user } = result.data.login;
       localStorage.setItem('token', token);
-      // ユーザーをリダイレクトする
+      localStorage.setItem('userId', user.id);
       router.push('/top-page');
     } catch (error) {
       console.error('Login failed:', error);
-      // エラーメッセージを表示する
       alert('ログインに失敗しました');
-      return;
     }
   };
 

@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	github.com/99designs/gqlgen v0.17.49
+	github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service v0.0.0
 	github.com/ZONO33LHD/sircle/backend/kakeibo-user-service v0.0.0
 	github.com/rs/cors v1.11.0
 	github.com/vektah/gqlparser/v2 v2.5.16
@@ -33,6 +34,8 @@ require (
 )
 
 replace (
+	github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service => ../kakeibo-transaction-service
+	github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/pkg/grpc/pb => ../kakeibo-transaction-service/pkg/grpc/pb
 	github.com/ZONO33LHD/sircle/backend/kakeibo-user-service => ../kakeibo-user-service
 	github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb => ../kakeibo-user-service/pkg/grpc/pb
 )

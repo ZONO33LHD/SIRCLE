@@ -22,21 +22,21 @@ type TransactionType = 'income' | 'expense';
 
 const categoryIds = {
   income: {
-    '給与': 'SALARY',
-    '副収入': 'SIDE_INCOME',
-    '投資': 'INVESTMENT',
-    'その他': 'OTHER_INCOME'
+    給与: 'SALARY',
+    副収入: 'SIDE_INCOME',
+    投資: 'INVESTMENT',
+    その他: 'OTHER_INCOME',
   },
   expense: {
-    '食費': 'FOOD',
-    '家賃': 'RENT',
-    '光熱費': 'UTILITIES',
-    '交通費': 'TRANSPORTATION',
-    '通信費': 'COMMUNICATION',
-    '娯楽費': 'ENTERTAINMENT',
-    '医療費': 'MEDICAL',
-    'その他': 'OTHER_EXPENSE'
-  }
+    食費: 'FOOD',
+    家賃: 'RENT',
+    光熱費: 'UTILITIES',
+    交通費: 'TRANSPORTATION',
+    通信費: 'COMMUNICATION',
+    娯楽費: 'ENTERTAINMENT',
+    医療費: 'MEDICAL',
+    その他: 'OTHER_EXPENSE',
+  },
 };
 
 export default function TransactionForm() {
@@ -46,6 +46,13 @@ export default function TransactionForm() {
   const [date, setDate] = useState('');
   const [createTransaction] = useMutation(CREATE_TRANSACTION);
 
+  const getUserId = () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('userId');
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -54,17 +61,24 @@ export default function TransactionForm() {
       return;
     }
 
+    const userId = getUserId();
+    if (!userId) {
+      alert('ユーザーIDが見つかりません。再度ログインしてください。');
+      return;
+    }
+
     const typeKey = type.toUpperCase();
-    const categoryKey = categoryIds[type][category as keyof typeof categoryIds[typeof type]];
+    const categoryKey = categoryIds[type][category as keyof (typeof categoryIds)[typeof type]];
 
     try {
       const result = await createTransaction({
         variables: {
           input: {
-            userId: 'ユーザーIDをここに設定',
+            userId: userId,
             amount: parseFloat(amount),
             type: typeKey,
             categoryId: categoryKey,
+            categoryName: category,
             date: new Date(date).toISOString(),
             description: '',
             isRecurring: false,

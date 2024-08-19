@@ -5,9 +5,10 @@ import (
 	"log"
 	"os"
 
-	transactiongrpc "github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/internal/pkg/grpc/pb"
+	transactiongrpc "github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/pkg/grpc"
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/infrastructure/persistence"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -27,10 +28,11 @@ func main() {
 	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		dbUser, dbPassword, dbHost, dbPort, dbName, sslMode)
 
-	userRepo := persistence.NewTransactionRepository(dataSourceName)
+	transactionRepo := persistence.NewTransactionRepository(dataSourceName)
 
-	userService := transactiongrpc.NewTransactionService(userRepo)
-	server := transactiongrpc.NewServer(userService)
+	transactionService := transactiongrpc.NewTransactionService(transactionRepo)
+
+	server := transactiongrpc.NewServer(transactionService)
 
 	log.Println("Starting gRPC server on :50052")
 	if err := server.Run(":50052"); err != nil {

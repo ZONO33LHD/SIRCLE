@@ -50,6 +50,7 @@ type CreateTransactionInput struct {
 	Amount             float64             `json:"amount"`
 	Type               TransactionType     `json:"type"`
 	CategoryID         string              `json:"categoryId"`
+	CategoryName       string              `json:"categoryName"`
 	Date               string              `json:"date"`
 	Description        *string             `json:"description,omitempty"`
 	IsRecurring        bool                `json:"isRecurring"`

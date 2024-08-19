@@ -6552,7 +6552,7 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"userId", "amount", "type", "categoryId", "date", "description", "isRecurring", "recurringFrequency"}
+	fieldsInOrder := [...]string{"userId", "amount", "type", "categoryId", "categoryName", "date", "description", "isRecurring", "recurringFrequency"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6587,6 +6587,13 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.CategoryID = data
+		case "categoryName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CategoryName = data
 		case "date":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
 			data, err := ec.unmarshalNDateTime2string(ctx, v)
