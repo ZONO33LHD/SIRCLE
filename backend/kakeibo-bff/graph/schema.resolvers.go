@@ -7,6 +7,8 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-bff/graph/model"
 	transactionpb "github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/pkg/grpc/pb"
@@ -52,16 +54,27 @@ func (r *mutationResolver) CreateTransaction(ctx context.Context, input model.Cr
 		return nil, fmt.Errorf("TransactionServiceClient is not initialized")
 	}
 
+	date, err := time.Parse(time.RFC3339, input.Date)
+	if err != nil {
+		return nil, fmt.Errorf("無効な日付形式です: %v", err)
+	}
+
+	categoryID, err := strconv.ParseInt(input.CategoryID, 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("カテゴリーIDの変換に失敗しました: %v", err)
+	}
+
 	resp, err := r.TransactionServiceClient.CreateTransaction(ctx, &transactionpb.CreateTransactionRequest{
 		UserId:       input.UserID,
 		Amount:       float32(input.Amount),
-		Type:         string(input.Type),
-		CategoryId:   input.CategoryID,
+		Type:         TransactionTypeToString(input.Type),
+		CategoryId:   int32(categoryID),
 		CategoryName: input.CategoryName,
-		Date:         input.Date,
+		Date:         date.Format(time.RFC3339),
 		Description:  *input.Description,
 		IsRecurring:  input.IsRecurring,
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("取引の作成に失敗しました: %v", err)
 	}
@@ -72,8 +85,9 @@ func (r *mutationResolver) CreateTransaction(ctx context.Context, input model.Cr
 		Amount: float64(resp.Transaction.Amount),
 		Type:   model.TransactionType(resp.Transaction.Type),
 		Category: &model.Category{
-			ID:   resp.Transaction.CategoryId,
+			ID:   fmt.Sprintf("%d", resp.Transaction.CategoryId),
 			Name: resp.Transaction.CategoryName,
+			Type: model.TransactionType(resp.Transaction.Type),
 		},
 		Date:        resp.Transaction.Date,
 		Description: &resp.Transaction.Description,

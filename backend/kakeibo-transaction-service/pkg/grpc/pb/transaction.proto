@@ -10,7 +10,7 @@ message Transaction {
     string userId = 2;
     float amount = 3;
     string type = 4;
-    string categoryId = 5;
+    int32 categoryId = 5;
     string categoryName = 6;
     string date = 7;
     string description = 8;
@@ -21,7 +21,7 @@ message CreateTransactionRequest {
     string userId = 1;
     float amount = 2;
     string type = 3;
-    string categoryId = 4;
+    int32 categoryId = 4;
     string categoryName = 5;
     string date = 6;
     string description = 7;

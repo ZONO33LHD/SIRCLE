@@ -7,7 +7,7 @@ type Transaction struct {
 	UserId string `json:"user_id"`
 	Amount float64 `json:"amount"`
 	Type string `json:"type"`
-	CategoryId string `json:"category_id"`
+	CategoryId int32 `json:"category_id"`
 	CategoryName string `json:"category_name"`
 	Date time.Time `json:"date"`
 	Description string `json:"description"`

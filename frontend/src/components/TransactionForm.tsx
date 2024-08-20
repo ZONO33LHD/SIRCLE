@@ -22,27 +22,27 @@ type TransactionType = 'income' | 'expense';
 
 const categoryIds = {
   income: {
-    給与: 'SALARY',
-    副収入: 'SIDE_INCOME',
-    投資: 'INVESTMENT',
-    その他: 'OTHER_INCOME',
+    SALARY: '1',
+    SIDE_INCOME: '2',
+    INVESTMENT: '3',
+    OTHER_INCOME: '4',
   },
   expense: {
-    食費: 'FOOD',
-    家賃: 'RENT',
-    光熱費: 'UTILITIES',
-    交通費: 'TRANSPORTATION',
-    通信費: 'COMMUNICATION',
-    娯楽費: 'ENTERTAINMENT',
-    医療費: 'MEDICAL',
-    その他: 'OTHER_EXPENSE',
+    FOOD: '5',
+    RENT: '6',
+    UTILITIES: '7',
+    TRANSPORTATION: '8',
+    COMMUNICATION: '9',
+    ENTERTAINMENT: '10',
+    MEDICAL: '11',
+    OTHER_EXPENSE: '12',
   },
 };
 
 export default function TransactionForm() {
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState({ id: '', name: '' });
   const [date, setDate] = useState('');
   const [createTransaction] = useMutation(CREATE_TRANSACTION);
 
@@ -56,7 +56,7 @@ export default function TransactionForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!amount || !category || !date) {
+    if (!amount || !category.id || !date) {
       alert('全ての項目を入力してください。');
       return;
     }
@@ -68,7 +68,6 @@ export default function TransactionForm() {
     }
 
     const typeKey = type.toUpperCase();
-    const categoryKey = categoryIds[type][category as keyof (typeof categoryIds)[typeof type]];
 
     try {
       const result = await createTransaction({
@@ -77,8 +76,8 @@ export default function TransactionForm() {
             userId: userId,
             amount: parseFloat(amount),
             type: typeKey,
-            categoryId: categoryKey,
-            categoryName: category,
+            categoryId: category.id,
+            categoryName: category.name,
             date: new Date(date).toISOString(),
             description: '',
             isRecurring: false,
@@ -90,7 +89,7 @@ export default function TransactionForm() {
 
       // フォームをリセット
       setAmount('');
-      setCategory('');
+      setCategory({ id: '', name: '' });
       setDate('');
 
       alert('取引が正常に保存されました。');
@@ -136,18 +135,18 @@ export default function TransactionForm() {
         <div className="mb-4 h-24">
           <label className="mb-2 block text-sm font-medium text-gray-700">カテゴリ</label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-            {Object.keys(categoryIds[type]).map((cat) => (
+            {Object.entries(categoryIds[type]).map(([id, name]) => (
               <button
-                key={cat}
+                key={id}
                 type="button"
-                onClick={() => setCategory(cat)}
+                onClick={() => setCategory({ id: id, name: name })}
                 className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  category === cat
+                  category.id === id
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                {cat}
+                {name}
               </button>
             ))}
           </div>

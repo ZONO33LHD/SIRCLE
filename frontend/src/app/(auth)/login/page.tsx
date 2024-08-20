@@ -96,7 +96,7 @@ export default function Login() {
             </Link>
           </div>
           <div className="mt-8 flex justify-center space-x-4">
-          <Link href="#" className="text-black hover:text-blue-700">
+            <Link href="#" className="text-black hover:text-blue-700">
               <FontAwesomeIcon icon={faXTwitter} size="2x" />
             </Link>
             <Link href="#" className="text-green-500 hover:text-green-700">

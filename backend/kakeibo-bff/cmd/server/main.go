@@ -11,6 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-bff/graph"
 	pb "github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb"
+	transactionpb "github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/pkg/grpc/pb"
 	"github.com/rs/cors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"google.golang.org/grpc"
@@ -31,17 +32,27 @@ func main() {
 	}
 
 	// ユーザーサービスのgRPCサーバーに接続
-	conn, err := grpc.NewClient("localhost:50051", opts...)
+	userConn, err := grpc.Dial("localhost:50051", opts...)
 	if err != nil {
-		log.Fatalf("Failed to create gRPC client: %v", err)
+		log.Fatalf("Failed to connect to user service: %v", err)
 	}
-	defer conn.Close()
+	defer userConn.Close()
 
-	userServiceClient := pb.NewUserServiceClient(conn)
+	userServiceClient := pb.NewUserServiceClient(userConn)
+
+	// トランザクションサービスのgRPCサーバーに接続
+	transactionConn, err := grpc.Dial("localhost:50052", opts...)
+	if err != nil {
+		log.Fatalf("Failed to connect to transaction service: %v", err)
+	}
+	defer transactionConn.Close()
+
+	transactionServiceClient := transactionpb.NewTransactionServiceClient(transactionConn)
 
 	// Resolverの初期化
 	resolver := &graph.Resolver{
-		UserServiceClient: userServiceClient,
+		UserServiceClient:        userServiceClient,
+		TransactionServiceClient: transactionServiceClient,
 	}
 
 	// GraphQLサーバーの作成
@@ -50,6 +61,7 @@ func main() {
 	srv.SetErrorPresenter(func(ctx context.Context, e error) *gqlerror.Error {
 		err := graphql.DefaultErrorPresenter(ctx, e)
 		log.Printf("GraphQL error: %v", err)
+		err.Message = "内部サーバーエラーが発生しました"
 		return err
 	})
 
