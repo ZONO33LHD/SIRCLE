@@ -3,7 +3,9 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/domain/model"
@@ -59,7 +61,7 @@ func (r *TransactionRepositoryImpl) CreateTransaction(ctx context.Context, trans
 		RETURNING id
 	`
 	now := time.Now()
-	var id string
+	var id int
 	err := r.db.QueryRowContext(ctx, query,
 		transaction.UserId,
 		transaction.Amount,
@@ -73,10 +75,18 @@ func (r *TransactionRepositoryImpl) CreateTransaction(ctx context.Context, trans
 	).Scan(&id)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("取引の作成に失敗しました: %v", err)
 	}
 
-	transaction.ID = id
+	// カテゴリー情報を取得
+	var categoryName string
+	err = r.db.QueryRowContext(ctx, "SELECT name FROM categories WHERE id = $1", transaction.CategoryId).Scan(&categoryName)
+	if err != nil {
+		return nil, fmt.Errorf("カテゴリー情報の取得に失敗しました: %v", err)
+	}
+
+	transaction.ID = strconv.Itoa(id)
+	transaction.CategoryName = categoryName
 	transaction.CreatedAt = now
 	transaction.UpdatedAt = now
 	return transaction, nil

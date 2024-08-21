@@ -6493,7 +6493,7 @@ func (ec *executionContext) unmarshalInputCreateBudgetInput(ctx context.Context,
 			it.Amount = data
 		case "categoryId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
-			data, err := ec.unmarshalNID2string(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6552,7 +6552,7 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"userId", "amount", "type", "categoryId", "categoryName", "date", "description", "isRecurring", "recurringFrequency"}
+	fieldsInOrder := [...]string{"userId", "amount", "type", "categoryId", "date", "description", "isRecurring", "recurringFrequency"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6582,18 +6582,11 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 			it.Type = data
 		case "categoryId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
-			data, err := ec.unmarshalNID2string(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CategoryID = data
-		case "categoryName":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryName"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CategoryName = data
 		case "date":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
 			data, err := ec.unmarshalNDateTime2string(ctx, v)
@@ -6788,7 +6781,7 @@ func (ec *executionContext) unmarshalInputTransactionFilter(ctx context.Context,
 			it.Type = data
 		case "categoryId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6822,7 +6815,7 @@ func (ec *executionContext) unmarshalInputUpdateBudgetInput(ctx context.Context,
 			it.Amount = data
 		case "categoryId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6952,7 +6945,7 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 			it.Type = data
 		case "categoryId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8541,6 +8534,21 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNNotificationPreferences2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐNotificationPreferences(ctx context.Context, sel ast.SelectionSet, v *model.NotificationPreferences) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -9094,19 +9102,19 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
-func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := graphql.UnmarshalID(v)
+	res, err := graphql.UnmarshalInt(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalID(*v)
+	res := graphql.MarshalInt(*v)
 	return res
 }
 

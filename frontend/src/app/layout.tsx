@@ -7,7 +7,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 
 config.autoAddCss = false;
 
-const noto = Noto_Sans_JP({ subsets: ['latin'] });
+const noto = Noto_Sans_JP({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -21,9 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <ApolloWrapper>
-        <body className={noto.className}>{children}</body>
-      </ApolloWrapper>
+      <body className={noto.className}>
+        <ApolloWrapper>{children}</ApolloWrapper>
+      </body>
     </html>
   );
 }

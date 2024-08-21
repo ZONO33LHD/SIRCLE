@@ -108,21 +108,19 @@ message CreateTransactionInput {
   TransactionType type = 3;
   string categoryId = 4;
   DateTime date = 5;
-  string categoryName = 6;
-  string description = 7;
-  bool isRecurring = 8;
-  RecurringFrequency recurringFrequency = 9;
+  string description = 6;
+  bool isRecurring = 7;
+  RecurringFrequency recurringFrequency = 8;
 }
 
 message UpdateTransactionInput {
   float amount = 1;
   TransactionType type = 2;
   string categoryId = 3;
-  string categoryName = 4;
-  DateTime date = 5;
-  string description = 6;
-  bool isRecurring = 7;
-  RecurringFrequency recurringFrequency = 8;
+  DateTime date = 4;
+  string description = 5;
+  bool isRecurring = 6;
+  RecurringFrequency recurringFrequency = 7;
 }
 
 message CreateBudgetInput {

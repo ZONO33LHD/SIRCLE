@@ -22,27 +22,27 @@ type TransactionType = 'income' | 'expense';
 
 const categoryIds = {
   income: {
-    SALARY: '1',
-    SIDE_INCOME: '2',
-    INVESTMENT: '3',
-    OTHER_INCOME: '4',
+    給与: 1,
+    諸手当: 2,
+    資金: 3,
+    その他の収入: 4,
   },
   expense: {
-    FOOD: '5',
-    RENT: '6',
-    UTILITIES: '7',
-    TRANSPORTATION: '8',
-    COMMUNICATION: '9',
-    ENTERTAINMENT: '10',
-    MEDICAL: '11',
-    OTHER_EXPENSE: '12',
+    食費: 5,
+    家賃: 6,
+    電気: 7,
+    交通費: 8,
+    通信費: 9,
+    エンターテインメント: 10,
+    医療費: 11,
+    その他の支出: 12,
   },
 };
 
 export default function TransactionForm() {
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState({ id: '', name: '' });
+  const [category, setCategory] = useState({ id: 0, name: '' });
   const [date, setDate] = useState('');
   const [createTransaction] = useMutation(CREATE_TRANSACTION);
 
@@ -53,7 +53,7 @@ export default function TransactionForm() {
     return null;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!amount || !category.id || !date) {
@@ -77,7 +77,6 @@ export default function TransactionForm() {
             amount: parseFloat(amount),
             type: typeKey,
             categoryId: category.id,
-            categoryName: category.name,
             date: new Date(date).toISOString(),
             description: '',
             isRecurring: false,
@@ -89,7 +88,7 @@ export default function TransactionForm() {
 
       // フォームをリセット
       setAmount('');
-      setCategory({ id: '', name: '' });
+      setCategory({ id: 0, name: '' });
       setDate('');
 
       alert('取引が正常に保存されました。');
@@ -135,11 +134,11 @@ export default function TransactionForm() {
         <div className="mb-4 h-24">
           <label className="mb-2 block text-sm font-medium text-gray-700">カテゴリ</label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-            {Object.entries(categoryIds[type]).map(([id, name]) => (
+            {Object.entries(categoryIds[type]).map(([name, id]) => (
               <button
-                key={id}
+                key={name}
                 type="button"
-                onClick={() => setCategory({ id: id, name: name })}
+                onClick={() => setCategory({ id: id as number, name: name })}
                 className={`rounded-md px-3 py-2 text-sm font-medium ${
                   category.id === id
                     ? 'bg-green-500 text-white'

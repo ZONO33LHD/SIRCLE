@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-bff/graph/model"
@@ -59,20 +58,14 @@ func (r *mutationResolver) CreateTransaction(ctx context.Context, input model.Cr
 		return nil, fmt.Errorf("無効な日付形式です: %v", err)
 	}
 
-	categoryID, err := strconv.ParseInt(input.CategoryID, 10, 32)
-	if err != nil {
-		return nil, fmt.Errorf("カテゴリーIDの変換に失敗しました: %v", err)
-	}
-
 	resp, err := r.TransactionServiceClient.CreateTransaction(ctx, &transactionpb.CreateTransactionRequest{
-		UserId:       input.UserID,
-		Amount:       float32(input.Amount),
-		Type:         TransactionTypeToString(input.Type),
-		CategoryId:   int32(categoryID),
-		CategoryName: input.CategoryName,
-		Date:         date.Format(time.RFC3339),
-		Description:  *input.Description,
-		IsRecurring:  input.IsRecurring,
+		UserId:      input.UserID,
+		Amount:      float32(input.Amount),
+		Type:        TransactionTypeToString(input.Type),
+		CategoryId:  int32(input.CategoryID),
+		Date:        date.Format(time.RFC3339),
+		Description: *input.Description,
+		IsRecurring: input.IsRecurring,
 	})
 
 	if err != nil {
@@ -80,7 +73,6 @@ func (r *mutationResolver) CreateTransaction(ctx context.Context, input model.Cr
 	}
 
 	return &model.Transaction{
-		ID:     resp.Transaction.Id,
 		UserID: resp.Transaction.UserId,
 		Amount: float64(resp.Transaction.Amount),
 		Type:   model.TransactionType(resp.Transaction.Type),

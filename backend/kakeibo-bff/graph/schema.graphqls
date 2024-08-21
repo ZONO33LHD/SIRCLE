@@ -144,8 +144,7 @@ input CreateTransactionInput {
   userId: ID!
   amount: Float!
   type: TransactionType!
-  categoryId: ID!
-  categoryName: String!
+  categoryId: Int!
   date: DateTime!
   description: String
   isRecurring: Boolean!
@@ -156,7 +155,7 @@ input CreateTransactionInput {
 input UpdateTransactionInput {
   amount: Float
   type: TransactionType
-  categoryId: ID
+  categoryId: Int
   date: DateTime
   description: String
   isRecurring: Boolean
@@ -167,14 +166,14 @@ input UpdateTransactionInput {
 input CreateBudgetInput {
   userId: ID!
   amount: Float!
-  categoryId: ID!
+  categoryId: Int!
   period: Period!
 }
 
 # 予算更新入力の型定義
 input UpdateBudgetInput {
   amount: Float
-  categoryId: ID
+  categoryId: Int
   period: Period
 }
 
@@ -217,7 +216,7 @@ input TransactionFilter {
   startDate: Date
   endDate: Date
   type: TransactionType
-  categoryId: ID
+  categoryId: Int
 }
 
 # 取引タイプの列挙型

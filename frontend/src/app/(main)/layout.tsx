@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Noto_Sans_JP } from 'next/font/google';
 import Header from '@/components/Header';
 import SideBar from '@/components/SideBar';
 import '@/app/globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const noto = Noto_Sans_JP({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -17,13 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="ja">
+      <body className={noto.className}>
         <div className="flex h-screen flex-col">
           <Header />
           <div className="flex flex-1 overflow-hidden">
             <SideBar />
-            <main className="flex flex-1 flex-col overflow-y-auto p-4 bg-gray-100">
+            <main className="flex flex-1 flex-col overflow-y-auto bg-gray-100">
               <div className="flex-1">{children}</div>
               <div className="h-16"></div>
             </main>

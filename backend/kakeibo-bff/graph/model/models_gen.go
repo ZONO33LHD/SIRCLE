@@ -36,7 +36,7 @@ type CategoryBreakdown struct {
 type CreateBudgetInput struct {
 	UserID     string  `json:"userId"`
 	Amount     float64 `json:"amount"`
-	CategoryID string  `json:"categoryId"`
+	CategoryID int     `json:"categoryId"`
 	Period     Period  `json:"period"`
 }
 
@@ -49,8 +49,7 @@ type CreateTransactionInput struct {
 	UserID             string              `json:"userId"`
 	Amount             float64             `json:"amount"`
 	Type               TransactionType     `json:"type"`
-	CategoryID         string              `json:"categoryId"`
-	CategoryName       string              `json:"categoryName"`
+	CategoryID         int                 `json:"categoryId"`
 	Date               string              `json:"date"`
 	Description        *string             `json:"description,omitempty"`
 	IsRecurring        bool                `json:"isRecurring"`
@@ -119,7 +118,7 @@ type TransactionFilter struct {
 	StartDate  *string          `json:"startDate,omitempty"`
 	EndDate    *string          `json:"endDate,omitempty"`
 	Type       *TransactionType `json:"type,omitempty"`
-	CategoryID *string          `json:"categoryId,omitempty"`
+	CategoryID *int             `json:"categoryId,omitempty"`
 }
 
 type TrendPoint struct {
@@ -129,7 +128,7 @@ type TrendPoint struct {
 
 type UpdateBudgetInput struct {
 	Amount     *float64 `json:"amount,omitempty"`
-	CategoryID *string  `json:"categoryId,omitempty"`
+	CategoryID *int     `json:"categoryId,omitempty"`
 	Period     *Period  `json:"period,omitempty"`
 }
 
@@ -148,7 +147,7 @@ type UpdateGoalInput struct {
 type UpdateTransactionInput struct {
 	Amount             *float64            `json:"amount,omitempty"`
 	Type               *TransactionType    `json:"type,omitempty"`
-	CategoryID         *string             `json:"categoryId,omitempty"`
+	CategoryID         *int                `json:"categoryId,omitempty"`
 	Date               *string             `json:"date,omitempty"`
 	Description        *string             `json:"description,omitempty"`
 	IsRecurring        *bool               `json:"isRecurring,omitempty"`
