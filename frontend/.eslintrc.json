@@ -1,13 +1,11 @@
 {
   "extends": [
-    "next/core-web-vitals",
-    "plugin:tailwindcss/recommended",
-    "plugin:prettier/recommended"
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
   ],
-  "plugins": ["prettier"],
-  "ignorePatterns": ["*.config.js"],
+  "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
-    "prettier/prettier": "error",
-    "tailwindcss/classnames-order": "warn"
+    "prettier/prettier": "error"
   }
 }

@@ -4,6 +4,7 @@ import '@/app/globals.css';
 import ApolloWrapper from '@/lib/apollo-wrapper';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import { FinancialProvider } from '@/components/FinancialContext';
 
 config.autoAddCss = false;
 
@@ -16,13 +17,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ja">
       <body className={noto.className}>
-        <ApolloWrapper>{children}</ApolloWrapper>
+        <ApolloWrapper>
+            {children}
+        </ApolloWrapper>
       </body>
     </html>
   );

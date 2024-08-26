@@ -2,6 +2,12 @@
 
 import React, { useState } from 'react';
 import { useMutation, gql } from '@apollo/client';
+import { useFinancial } from './FinancialContext';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { ja } from 'date-fns/locale';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const CREATE_TRANSACTION = gql`
   mutation CreateTransaction($input: CreateTransactionInput!) {
@@ -33,7 +39,7 @@ const categoryIds = {
     電気: 7,
     交通費: 8,
     通信費: 9,
-    エンターテインメント: 10,
+    娯楽: 10,
     医療費: 11,
     その他の支出: 12,
   },
@@ -42,9 +48,11 @@ const categoryIds = {
 export default function TransactionForm() {
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState({ id: 0, name: '' });
-  const [date, setDate] = useState('');
+  const [category, setCategory] = useState<{ id: number; name: string } | null>(null);
+  const [date, setDate] = useState<Date>(new Date());
+  const [isDateOpen, setIsDateOpen] = useState(false);
   const [createTransaction] = useMutation(CREATE_TRANSACTION);
+  const { updateFinancialData } = useFinancial();
 
   const getUserId = () => {
     if (typeof window !== 'undefined') {
@@ -56,7 +64,7 @@ export default function TransactionForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!amount || !category.id || !date) {
+    if (!amount || !category || !date) {
       alert('全ての項目を入力してください。');
       return;
     }
@@ -76,8 +84,8 @@ export default function TransactionForm() {
             userId: userId,
             amount: parseFloat(amount),
             type: typeKey,
-            categoryId: category.id,
-            date: new Date(date).toISOString(),
+            categoryId: category?.id || 0,
+            date: date.toISOString(),
             description: '',
             isRecurring: false,
           },
@@ -88,8 +96,11 @@ export default function TransactionForm() {
 
       // フォームをリセット
       setAmount('');
-      setCategory({ id: 0, name: '' });
-      setDate('');
+      setCategory(null);
+      setDate(new Date());
+
+      // 収支データを更新
+      await updateFinancialData();
 
       alert('取引が正常に保存されました。');
     } catch (error) {
@@ -97,6 +108,39 @@ export default function TransactionForm() {
       alert('取引の保存中にエラーが発生しました。');
     }
   };
+
+  const handleCategoryClick = (id: number, name: string) => {
+    if (category && category.id === id) {
+      // 同じカテゴリが選択された場合、選択を解除
+      setCategory(null);
+    } else {
+      // 新しいカテゴリを選択
+      setCategory({ id, name });
+    }
+  };
+
+  const renderDateSelector = () => (
+    <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-start text-left font-normal">
+          <span>{format(date, 'yyyy/MM/dd', { locale: ja })}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={(newDate: Date | undefined) => {
+            if (newDate) {
+              setDate(newDate);
+              setIsDateOpen(false);
+            }
+          }}
+          locale={ja}
+        />
+      </PopoverContent>
+    </Popover>
+  );
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-md">
@@ -131,16 +175,16 @@ export default function TransactionForm() {
             className="w-full rounded-md border border-gray-300 px-3 py-2"
           />
         </div>
-        <div className="mb-4 h-24">
+        <div className="mb-4">
           <label className="mb-2 block text-sm font-medium text-gray-700">カテゴリ</label>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+          <div className="grid min-h-[120px] grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 content-start">
             {Object.entries(categoryIds[type]).map(([name, id]) => (
               <button
                 key={name}
                 type="button"
-                onClick={() => setCategory({ id: id as number, name: name })}
-                className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  category.id === id
+                onClick={() => handleCategoryClick(id as number, name)}
+                className={`h-10 rounded-md px-3 py-2 text-sm font-medium ${
+                  category && category.id === id
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
@@ -152,12 +196,9 @@ export default function TransactionForm() {
         </div>
         <div className="mb-4">
           <label className="mb-2 block text-sm font-medium text-gray-700">日付</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2"
-          />
+          <div className="w-full">
+            {renderDateSelector()}
+          </div>
         </div>
         <button
           type="submit"
