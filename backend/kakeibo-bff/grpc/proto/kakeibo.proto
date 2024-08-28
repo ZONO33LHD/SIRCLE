@@ -225,6 +225,7 @@ service KakeiboService {
   rpc SetGoal(SetGoalInput) returns (Goal);
   rpc UpdateGoal(UpdateGoalRequest) returns (Goal);
   rpc SetNotificationPreferences(SetNotificationPreferencesRequest) returns (User);
+  rpc GetIncomeExpenseSummary(GetIncomeExpenseSummaryRequest) returns (IncomeExpenseSummary);
 }
 
 // リクエストとレスポンスの定義
@@ -300,6 +301,22 @@ message DeleteCategoryResponse {
 message UpdateGoalRequest {
   string id = 1;
   UpdateGoalInput input = 2;
+}
+
+message GetIncomeExpenseSummaryRequest {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message IncomeExpenseSummary {
+  repeated SummaryItem income_items = 1;
+  repeated SummaryItem expense_items = 2;
+  float balance = 3;
+}
+
+message SummaryItem {
+  string title = 1;
+  float amount = 2;
 }
 
 message SetNotificationPreferencesRequest {

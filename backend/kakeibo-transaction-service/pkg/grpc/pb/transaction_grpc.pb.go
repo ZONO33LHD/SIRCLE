@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TransactionService_CreateTransaction_FullMethodName = "/transaction.TransactionService/CreateTransaction"
-	TransactionService_DeleteTransaction_FullMethodName = "/transaction.TransactionService/DeleteTransaction"
+	TransactionService_CreateTransaction_FullMethodName       = "/transaction.TransactionService/CreateTransaction"
+	TransactionService_DeleteTransaction_FullMethodName       = "/transaction.TransactionService/DeleteTransaction"
+	TransactionService_GetIncomeExpenseSummary_FullMethodName = "/transaction.TransactionService/GetIncomeExpenseSummary"
 )
 
 // TransactionServiceClient is the client API for TransactionService service.
@@ -33,6 +34,8 @@ type TransactionServiceClient interface {
 	CreateTransaction(ctx context.Context, in *CreateTransactionRequest, opts ...grpc.CallOption) (*CreateTransactionResponse, error)
 	// 取引を削除
 	DeleteTransaction(ctx context.Context, in *DeleteTransactionRequest, opts ...grpc.CallOption) (*DeleteTransactionResponse, error)
+	// 収支集計を取得
+	GetIncomeExpenseSummary(ctx context.Context, in *GetIncomeExpenseSummaryRequest, opts ...grpc.CallOption) (*GetIncomeExpenseSummaryResponse, error)
 }
 
 type transactionServiceClient struct {
@@ -63,6 +66,16 @@ func (c *transactionServiceClient) DeleteTransaction(ctx context.Context, in *De
 	return out, nil
 }
 
+func (c *transactionServiceClient) GetIncomeExpenseSummary(ctx context.Context, in *GetIncomeExpenseSummaryRequest, opts ...grpc.CallOption) (*GetIncomeExpenseSummaryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetIncomeExpenseSummaryResponse)
+	err := c.cc.Invoke(ctx, TransactionService_GetIncomeExpenseSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TransactionServiceServer is the server API for TransactionService service.
 // All implementations must embed UnimplementedTransactionServiceServer
 // for forward compatibility.
@@ -73,6 +86,8 @@ type TransactionServiceServer interface {
 	CreateTransaction(context.Context, *CreateTransactionRequest) (*CreateTransactionResponse, error)
 	// 取引を削除
 	DeleteTransaction(context.Context, *DeleteTransactionRequest) (*DeleteTransactionResponse, error)
+	// 収支集計を取得
+	GetIncomeExpenseSummary(context.Context, *GetIncomeExpenseSummaryRequest) (*GetIncomeExpenseSummaryResponse, error)
 	mustEmbedUnimplementedTransactionServiceServer()
 }
 
@@ -88,6 +103,9 @@ func (UnimplementedTransactionServiceServer) CreateTransaction(context.Context, 
 }
 func (UnimplementedTransactionServiceServer) DeleteTransaction(context.Context, *DeleteTransactionRequest) (*DeleteTransactionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTransaction not implemented")
+}
+func (UnimplementedTransactionServiceServer) GetIncomeExpenseSummary(context.Context, *GetIncomeExpenseSummaryRequest) (*GetIncomeExpenseSummaryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIncomeExpenseSummary not implemented")
 }
 func (UnimplementedTransactionServiceServer) mustEmbedUnimplementedTransactionServiceServer() {}
 func (UnimplementedTransactionServiceServer) testEmbeddedByValue()                            {}
@@ -146,6 +164,24 @@ func _TransactionService_DeleteTransaction_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TransactionService_GetIncomeExpenseSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIncomeExpenseSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransactionServiceServer).GetIncomeExpenseSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TransactionService_GetIncomeExpenseSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransactionServiceServer).GetIncomeExpenseSummary(ctx, req.(*GetIncomeExpenseSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TransactionService_ServiceDesc is the grpc.ServiceDesc for TransactionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -160,6 +196,10 @@ var TransactionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTransaction",
 			Handler:    _TransactionService_DeleteTransaction_Handler,
+		},
+		{
+			MethodName: "GetIncomeExpenseSummary",
+			Handler:    _TransactionService_GetIncomeExpenseSummary_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

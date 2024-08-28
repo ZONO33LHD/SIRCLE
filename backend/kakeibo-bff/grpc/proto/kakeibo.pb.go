@@ -2786,6 +2786,179 @@ func (x *UpdateGoalRequest) GetInput() *UpdateGoalInput {
 	return nil
 }
 
+type GetIncomeExpenseSummaryRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	StartDate string `protobuf:"bytes,1,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
+	EndDate   string `protobuf:"bytes,2,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
+}
+
+func (x *GetIncomeExpenseSummaryRequest) Reset() {
+	*x = GetIncomeExpenseSummaryRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kakeibo_proto_msgTypes[40]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetIncomeExpenseSummaryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetIncomeExpenseSummaryRequest) ProtoMessage() {}
+
+func (x *GetIncomeExpenseSummaryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_kakeibo_proto_msgTypes[40]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetIncomeExpenseSummaryRequest.ProtoReflect.Descriptor instead.
+func (*GetIncomeExpenseSummaryRequest) Descriptor() ([]byte, []int) {
+	return file_kakeibo_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *GetIncomeExpenseSummaryRequest) GetStartDate() string {
+	if x != nil {
+		return x.StartDate
+	}
+	return ""
+}
+
+func (x *GetIncomeExpenseSummaryRequest) GetEndDate() string {
+	if x != nil {
+		return x.EndDate
+	}
+	return ""
+}
+
+type IncomeExpenseSummary struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IncomeItems  []*SummaryItem `protobuf:"bytes,1,rep,name=income_items,json=incomeItems,proto3" json:"income_items,omitempty"`
+	ExpenseItems []*SummaryItem `protobuf:"bytes,2,rep,name=expense_items,json=expenseItems,proto3" json:"expense_items,omitempty"`
+	Balance      float32        `protobuf:"fixed32,3,opt,name=balance,proto3" json:"balance,omitempty"`
+}
+
+func (x *IncomeExpenseSummary) Reset() {
+	*x = IncomeExpenseSummary{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kakeibo_proto_msgTypes[41]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IncomeExpenseSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IncomeExpenseSummary) ProtoMessage() {}
+
+func (x *IncomeExpenseSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_kakeibo_proto_msgTypes[41]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IncomeExpenseSummary.ProtoReflect.Descriptor instead.
+func (*IncomeExpenseSummary) Descriptor() ([]byte, []int) {
+	return file_kakeibo_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *IncomeExpenseSummary) GetIncomeItems() []*SummaryItem {
+	if x != nil {
+		return x.IncomeItems
+	}
+	return nil
+}
+
+func (x *IncomeExpenseSummary) GetExpenseItems() []*SummaryItem {
+	if x != nil {
+		return x.ExpenseItems
+	}
+	return nil
+}
+
+func (x *IncomeExpenseSummary) GetBalance() float32 {
+	if x != nil {
+		return x.Balance
+	}
+	return 0
+}
+
+type SummaryItem struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Title  string  `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Amount float32 `protobuf:"fixed32,2,opt,name=amount,proto3" json:"amount,omitempty"`
+}
+
+func (x *SummaryItem) Reset() {
+	*x = SummaryItem{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kakeibo_proto_msgTypes[42]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SummaryItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SummaryItem) ProtoMessage() {}
+
+func (x *SummaryItem) ProtoReflect() protoreflect.Message {
+	mi := &file_kakeibo_proto_msgTypes[42]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SummaryItem.ProtoReflect.Descriptor instead.
+func (*SummaryItem) Descriptor() ([]byte, []int) {
+	return file_kakeibo_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *SummaryItem) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *SummaryItem) GetAmount() float32 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
 type SetNotificationPreferencesRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2798,7 +2971,7 @@ type SetNotificationPreferencesRequest struct {
 func (x *SetNotificationPreferencesRequest) Reset() {
 	*x = SetNotificationPreferencesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_kakeibo_proto_msgTypes[40]
+		mi := &file_kakeibo_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2811,7 +2984,7 @@ func (x *SetNotificationPreferencesRequest) String() string {
 func (*SetNotificationPreferencesRequest) ProtoMessage() {}
 
 func (x *SetNotificationPreferencesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_kakeibo_proto_msgTypes[40]
+	mi := &file_kakeibo_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2824,7 +2997,7 @@ func (x *SetNotificationPreferencesRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use SetNotificationPreferencesRequest.ProtoReflect.Descriptor instead.
 func (*SetNotificationPreferencesRequest) Descriptor() ([]byte, []int) {
-	return file_kakeibo_proto_rawDescGZIP(), []int{40}
+	return file_kakeibo_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *SetNotificationPreferencesRequest) GetUserId() string {
@@ -3153,7 +3326,27 @@ var file_kakeibo_proto_rawDesc = []byte{
 	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x2e, 0x0a,
 	0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x6b,
 	0x61, 0x6b, 0x65, 0x69, 0x62, 0x6f, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x47, 0x6f, 0x61,
-	0x6c, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x22, 0x78, 0x0a,
+	0x6c, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x22, 0x5a, 0x0a,
+	0x1e, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x45, 0x78, 0x70, 0x65, 0x6e, 0x73,
+	0x65, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x1d, 0x0a, 0x0a, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x64, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x09, 0x73, 0x74, 0x61, 0x72, 0x74, 0x44, 0x61, 0x74, 0x65, 0x12, 0x19,
+	0x0a, 0x08, 0x65, 0x6e, 0x64, 0x5f, 0x64, 0x61, 0x74, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x07, 0x65, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x65, 0x22, 0xa4, 0x01, 0x0a, 0x14, 0x49, 0x6e,
+	0x63, 0x6f, 0x6d, 0x65, 0x45, 0x78, 0x70, 0x65, 0x6e, 0x73, 0x65, 0x53, 0x75, 0x6d, 0x6d, 0x61,
+	0x72, 0x79, 0x12, 0x37, 0x0a, 0x0c, 0x69, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x5f, 0x69, 0x74, 0x65,
+	0x6d, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x6b, 0x61, 0x6b, 0x65, 0x69,
+	0x62, 0x6f, 0x2e, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x0b,
+	0x69, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x49, 0x74, 0x65, 0x6d, 0x73, 0x12, 0x39, 0x0a, 0x0d, 0x65,
+	0x78, 0x70, 0x65, 0x6e, 0x73, 0x65, 0x5f, 0x69, 0x74, 0x65, 0x6d, 0x73, 0x18, 0x02, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x14, 0x2e, 0x6b, 0x61, 0x6b, 0x65, 0x69, 0x62, 0x6f, 0x2e, 0x53, 0x75, 0x6d,
+	0x6d, 0x61, 0x72, 0x79, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x0c, 0x65, 0x78, 0x70, 0x65, 0x6e, 0x73,
+	0x65, 0x49, 0x74, 0x65, 0x6d, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x02, 0x52, 0x07, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65,
+	0x22, 0x3b, 0x0a, 0x0b, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x49, 0x74, 0x65, 0x6d, 0x12,
+	0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x02, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x78, 0x0a,
 	0x21, 0x53, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
 	0x50, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
 	0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01,
@@ -3183,7 +3376,7 @@ var file_kakeibo_proto_rawDesc = []byte{
 	0x0e, 0x52, 0x45, 0x4d, 0x49, 0x4e, 0x44, 0x45, 0x52, 0x5f, 0x44, 0x41, 0x49, 0x4c, 0x59, 0x10,
 	0x00, 0x12, 0x13, 0x0a, 0x0f, 0x52, 0x45, 0x4d, 0x49, 0x4e, 0x44, 0x45, 0x52, 0x5f, 0x57, 0x45,
 	0x45, 0x4b, 0x4c, 0x59, 0x10, 0x01, 0x12, 0x14, 0x0a, 0x10, 0x52, 0x45, 0x4d, 0x49, 0x4e, 0x44,
-	0x45, 0x52, 0x5f, 0x4d, 0x4f, 0x4e, 0x54, 0x48, 0x4c, 0x59, 0x10, 0x02, 0x32, 0xeb, 0x09, 0x0a,
+	0x45, 0x52, 0x5f, 0x4d, 0x4f, 0x4e, 0x54, 0x48, 0x4c, 0x59, 0x10, 0x02, 0x32, 0xce, 0x0a, 0x0a,
 	0x0e, 0x4b, 0x61, 0x6b, 0x65, 0x69, 0x62, 0x6f, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
 	0x31, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x12, 0x17, 0x2e, 0x6b, 0x61, 0x6b,
 	0x65, 0x69, 0x62, 0x6f, 0x2e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75,
@@ -3262,8 +3455,15 @@ var file_kakeibo_proto_rawDesc = []byte{
 	0x2a, 0x2e, 0x6b, 0x61, 0x6b, 0x65, 0x69, 0x62, 0x6f, 0x2e, 0x53, 0x65, 0x74, 0x4e, 0x6f, 0x74,
 	0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65,
 	0x6e, 0x63, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0d, 0x2e, 0x6b, 0x61,
-	0x6b, 0x65, 0x69, 0x62, 0x6f, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x42, 0x0b, 0x5a, 0x09, 0x2e, 0x3b,
-	0x6b, 0x61, 0x6b, 0x65, 0x69, 0x62, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6b, 0x65, 0x69, 0x62, 0x6f, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x12, 0x61, 0x0a, 0x17, 0x47, 0x65,
+	0x74, 0x49, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x45, 0x78, 0x70, 0x65, 0x6e, 0x73, 0x65, 0x53, 0x75,
+	0x6d, 0x6d, 0x61, 0x72, 0x79, 0x12, 0x27, 0x2e, 0x6b, 0x61, 0x6b, 0x65, 0x69, 0x62, 0x6f, 0x2e,
+	0x47, 0x65, 0x74, 0x49, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x45, 0x78, 0x70, 0x65, 0x6e, 0x73, 0x65,
+	0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d,
+	0x2e, 0x6b, 0x61, 0x6b, 0x65, 0x69, 0x62, 0x6f, 0x2e, 0x49, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x45,
+	0x78, 0x70, 0x65, 0x6e, 0x73, 0x65, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x42, 0x0b, 0x5a,
+	0x09, 0x2e, 0x3b, 0x6b, 0x61, 0x6b, 0x65, 0x69, 0x62, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -3279,7 +3479,7 @@ func file_kakeibo_proto_rawDescGZIP() []byte {
 }
 
 var file_kakeibo_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_kakeibo_proto_msgTypes = make([]protoimpl.MessageInfo, 41)
+var file_kakeibo_proto_msgTypes = make([]protoimpl.MessageInfo, 44)
 var file_kakeibo_proto_goTypes = []any{
 	(TransactionType)(0),                      // 0: kakeibo.TransactionType
 	(Period)(0),                               // 1: kakeibo.Period
@@ -3326,7 +3526,10 @@ var file_kakeibo_proto_goTypes = []any{
 	(*DeleteCategoryRequest)(nil),             // 42: kakeibo.DeleteCategoryRequest
 	(*DeleteCategoryResponse)(nil),            // 43: kakeibo.DeleteCategoryResponse
 	(*UpdateGoalRequest)(nil),                 // 44: kakeibo.UpdateGoalRequest
-	(*SetNotificationPreferencesRequest)(nil), // 45: kakeibo.SetNotificationPreferencesRequest
+	(*GetIncomeExpenseSummaryRequest)(nil),    // 45: kakeibo.GetIncomeExpenseSummaryRequest
+	(*IncomeExpenseSummary)(nil),              // 46: kakeibo.IncomeExpenseSummary
+	(*SummaryItem)(nil),                       // 47: kakeibo.SummaryItem
+	(*SetNotificationPreferencesRequest)(nil), // 48: kakeibo.SetNotificationPreferencesRequest
 }
 var file_kakeibo_proto_depIdxs = []int32{
 	8,  // 0: kakeibo.User.transactions:type_name -> kakeibo.Transaction
@@ -3373,48 +3576,52 @@ var file_kakeibo_proto_depIdxs = []int32{
 	21, // 41: kakeibo.UpdateBudgetRequest.input:type_name -> kakeibo.UpdateBudgetInput
 	23, // 42: kakeibo.UpdateCategoryRequest.input:type_name -> kakeibo.UpdateCategoryInput
 	25, // 43: kakeibo.UpdateGoalRequest.input:type_name -> kakeibo.UpdateGoalInput
-	26, // 44: kakeibo.SetNotificationPreferencesRequest.input:type_name -> kakeibo.NotificationPreferencesInput
-	28, // 45: kakeibo.KakeiboService.GetUser:input_type -> kakeibo.GetUserRequest
-	29, // 46: kakeibo.KakeiboService.GetTransactions:input_type -> kakeibo.GetTransactionsRequest
-	31, // 47: kakeibo.KakeiboService.GetBudgets:input_type -> kakeibo.GetBudgetsRequest
-	33, // 48: kakeibo.KakeiboService.GetReports:input_type -> kakeibo.GetReportsRequest
-	34, // 49: kakeibo.KakeiboService.GetCategories:input_type -> kakeibo.GetCategoriesRequest
-	16, // 50: kakeibo.KakeiboService.CreateUser:input_type -> kakeibo.CreateUserInput
-	36, // 51: kakeibo.KakeiboService.UpdateUser:input_type -> kakeibo.UpdateUserRequest
-	18, // 52: kakeibo.KakeiboService.CreateTransaction:input_type -> kakeibo.CreateTransactionInput
-	37, // 53: kakeibo.KakeiboService.UpdateTransaction:input_type -> kakeibo.UpdateTransactionRequest
-	38, // 54: kakeibo.KakeiboService.DeleteTransaction:input_type -> kakeibo.DeleteTransactionRequest
-	20, // 55: kakeibo.KakeiboService.CreateBudget:input_type -> kakeibo.CreateBudgetInput
-	40, // 56: kakeibo.KakeiboService.UpdateBudget:input_type -> kakeibo.UpdateBudgetRequest
-	22, // 57: kakeibo.KakeiboService.CreateCategory:input_type -> kakeibo.CreateCategoryInput
-	41, // 58: kakeibo.KakeiboService.UpdateCategory:input_type -> kakeibo.UpdateCategoryRequest
-	42, // 59: kakeibo.KakeiboService.DeleteCategory:input_type -> kakeibo.DeleteCategoryRequest
-	24, // 60: kakeibo.KakeiboService.SetGoal:input_type -> kakeibo.SetGoalInput
-	44, // 61: kakeibo.KakeiboService.UpdateGoal:input_type -> kakeibo.UpdateGoalRequest
-	45, // 62: kakeibo.KakeiboService.SetNotificationPreferences:input_type -> kakeibo.SetNotificationPreferencesRequest
-	7,  // 63: kakeibo.KakeiboService.GetUser:output_type -> kakeibo.User
-	30, // 64: kakeibo.KakeiboService.GetTransactions:output_type -> kakeibo.GetTransactionsResponse
-	32, // 65: kakeibo.KakeiboService.GetBudgets:output_type -> kakeibo.GetBudgetsResponse
-	12, // 66: kakeibo.KakeiboService.GetReports:output_type -> kakeibo.Report
-	35, // 67: kakeibo.KakeiboService.GetCategories:output_type -> kakeibo.GetCategoriesResponse
-	7,  // 68: kakeibo.KakeiboService.CreateUser:output_type -> kakeibo.User
-	7,  // 69: kakeibo.KakeiboService.UpdateUser:output_type -> kakeibo.User
-	8,  // 70: kakeibo.KakeiboService.CreateTransaction:output_type -> kakeibo.Transaction
-	8,  // 71: kakeibo.KakeiboService.UpdateTransaction:output_type -> kakeibo.Transaction
-	39, // 72: kakeibo.KakeiboService.DeleteTransaction:output_type -> kakeibo.DeleteTransactionResponse
-	9,  // 73: kakeibo.KakeiboService.CreateBudget:output_type -> kakeibo.Budget
-	9,  // 74: kakeibo.KakeiboService.UpdateBudget:output_type -> kakeibo.Budget
-	10, // 75: kakeibo.KakeiboService.CreateCategory:output_type -> kakeibo.Category
-	10, // 76: kakeibo.KakeiboService.UpdateCategory:output_type -> kakeibo.Category
-	43, // 77: kakeibo.KakeiboService.DeleteCategory:output_type -> kakeibo.DeleteCategoryResponse
-	11, // 78: kakeibo.KakeiboService.SetGoal:output_type -> kakeibo.Goal
-	11, // 79: kakeibo.KakeiboService.UpdateGoal:output_type -> kakeibo.Goal
-	7,  // 80: kakeibo.KakeiboService.SetNotificationPreferences:output_type -> kakeibo.User
-	63, // [63:81] is the sub-list for method output_type
-	45, // [45:63] is the sub-list for method input_type
-	45, // [45:45] is the sub-list for extension type_name
-	45, // [45:45] is the sub-list for extension extendee
-	0,  // [0:45] is the sub-list for field type_name
+	47, // 44: kakeibo.IncomeExpenseSummary.income_items:type_name -> kakeibo.SummaryItem
+	47, // 45: kakeibo.IncomeExpenseSummary.expense_items:type_name -> kakeibo.SummaryItem
+	26, // 46: kakeibo.SetNotificationPreferencesRequest.input:type_name -> kakeibo.NotificationPreferencesInput
+	28, // 47: kakeibo.KakeiboService.GetUser:input_type -> kakeibo.GetUserRequest
+	29, // 48: kakeibo.KakeiboService.GetTransactions:input_type -> kakeibo.GetTransactionsRequest
+	31, // 49: kakeibo.KakeiboService.GetBudgets:input_type -> kakeibo.GetBudgetsRequest
+	33, // 50: kakeibo.KakeiboService.GetReports:input_type -> kakeibo.GetReportsRequest
+	34, // 51: kakeibo.KakeiboService.GetCategories:input_type -> kakeibo.GetCategoriesRequest
+	16, // 52: kakeibo.KakeiboService.CreateUser:input_type -> kakeibo.CreateUserInput
+	36, // 53: kakeibo.KakeiboService.UpdateUser:input_type -> kakeibo.UpdateUserRequest
+	18, // 54: kakeibo.KakeiboService.CreateTransaction:input_type -> kakeibo.CreateTransactionInput
+	37, // 55: kakeibo.KakeiboService.UpdateTransaction:input_type -> kakeibo.UpdateTransactionRequest
+	38, // 56: kakeibo.KakeiboService.DeleteTransaction:input_type -> kakeibo.DeleteTransactionRequest
+	20, // 57: kakeibo.KakeiboService.CreateBudget:input_type -> kakeibo.CreateBudgetInput
+	40, // 58: kakeibo.KakeiboService.UpdateBudget:input_type -> kakeibo.UpdateBudgetRequest
+	22, // 59: kakeibo.KakeiboService.CreateCategory:input_type -> kakeibo.CreateCategoryInput
+	41, // 60: kakeibo.KakeiboService.UpdateCategory:input_type -> kakeibo.UpdateCategoryRequest
+	42, // 61: kakeibo.KakeiboService.DeleteCategory:input_type -> kakeibo.DeleteCategoryRequest
+	24, // 62: kakeibo.KakeiboService.SetGoal:input_type -> kakeibo.SetGoalInput
+	44, // 63: kakeibo.KakeiboService.UpdateGoal:input_type -> kakeibo.UpdateGoalRequest
+	48, // 64: kakeibo.KakeiboService.SetNotificationPreferences:input_type -> kakeibo.SetNotificationPreferencesRequest
+	45, // 65: kakeibo.KakeiboService.GetIncomeExpenseSummary:input_type -> kakeibo.GetIncomeExpenseSummaryRequest
+	7,  // 66: kakeibo.KakeiboService.GetUser:output_type -> kakeibo.User
+	30, // 67: kakeibo.KakeiboService.GetTransactions:output_type -> kakeibo.GetTransactionsResponse
+	32, // 68: kakeibo.KakeiboService.GetBudgets:output_type -> kakeibo.GetBudgetsResponse
+	12, // 69: kakeibo.KakeiboService.GetReports:output_type -> kakeibo.Report
+	35, // 70: kakeibo.KakeiboService.GetCategories:output_type -> kakeibo.GetCategoriesResponse
+	7,  // 71: kakeibo.KakeiboService.CreateUser:output_type -> kakeibo.User
+	7,  // 72: kakeibo.KakeiboService.UpdateUser:output_type -> kakeibo.User
+	8,  // 73: kakeibo.KakeiboService.CreateTransaction:output_type -> kakeibo.Transaction
+	8,  // 74: kakeibo.KakeiboService.UpdateTransaction:output_type -> kakeibo.Transaction
+	39, // 75: kakeibo.KakeiboService.DeleteTransaction:output_type -> kakeibo.DeleteTransactionResponse
+	9,  // 76: kakeibo.KakeiboService.CreateBudget:output_type -> kakeibo.Budget
+	9,  // 77: kakeibo.KakeiboService.UpdateBudget:output_type -> kakeibo.Budget
+	10, // 78: kakeibo.KakeiboService.CreateCategory:output_type -> kakeibo.Category
+	10, // 79: kakeibo.KakeiboService.UpdateCategory:output_type -> kakeibo.Category
+	43, // 80: kakeibo.KakeiboService.DeleteCategory:output_type -> kakeibo.DeleteCategoryResponse
+	11, // 81: kakeibo.KakeiboService.SetGoal:output_type -> kakeibo.Goal
+	11, // 82: kakeibo.KakeiboService.UpdateGoal:output_type -> kakeibo.Goal
+	7,  // 83: kakeibo.KakeiboService.SetNotificationPreferences:output_type -> kakeibo.User
+	46, // 84: kakeibo.KakeiboService.GetIncomeExpenseSummary:output_type -> kakeibo.IncomeExpenseSummary
+	66, // [66:85] is the sub-list for method output_type
+	47, // [47:66] is the sub-list for method input_type
+	47, // [47:47] is the sub-list for extension type_name
+	47, // [47:47] is the sub-list for extension extendee
+	0,  // [0:47] is the sub-list for field type_name
 }
 
 func init() { file_kakeibo_proto_init() }
@@ -3904,6 +4111,42 @@ func file_kakeibo_proto_init() {
 			}
 		}
 		file_kakeibo_proto_msgTypes[40].Exporter = func(v any, i int) any {
+			switch v := v.(*GetIncomeExpenseSummaryRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kakeibo_proto_msgTypes[41].Exporter = func(v any, i int) any {
+			switch v := v.(*IncomeExpenseSummary); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kakeibo_proto_msgTypes[42].Exporter = func(v any, i int) any {
+			switch v := v.(*SummaryItem); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kakeibo_proto_msgTypes[43].Exporter = func(v any, i int) any {
 			switch v := v.(*SetNotificationPreferencesRequest); i {
 			case 0:
 				return &v.state
@@ -3922,7 +4165,7 @@ func file_kakeibo_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_kakeibo_proto_rawDesc,
 			NumEnums:      5,
-			NumMessages:   41,
+			NumMessages:   44,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

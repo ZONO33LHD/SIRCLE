@@ -37,6 +37,7 @@ const (
 	KakeiboService_SetGoal_FullMethodName                    = "/kakeibo.KakeiboService/SetGoal"
 	KakeiboService_UpdateGoal_FullMethodName                 = "/kakeibo.KakeiboService/UpdateGoal"
 	KakeiboService_SetNotificationPreferences_FullMethodName = "/kakeibo.KakeiboService/SetNotificationPreferences"
+	KakeiboService_GetIncomeExpenseSummary_FullMethodName    = "/kakeibo.KakeiboService/GetIncomeExpenseSummary"
 )
 
 // KakeiboServiceClient is the client API for KakeiboService service.
@@ -65,6 +66,7 @@ type KakeiboServiceClient interface {
 	SetGoal(ctx context.Context, in *SetGoalInput, opts ...grpc.CallOption) (*Goal, error)
 	UpdateGoal(ctx context.Context, in *UpdateGoalRequest, opts ...grpc.CallOption) (*Goal, error)
 	SetNotificationPreferences(ctx context.Context, in *SetNotificationPreferencesRequest, opts ...grpc.CallOption) (*User, error)
+	GetIncomeExpenseSummary(ctx context.Context, in *GetIncomeExpenseSummaryRequest, opts ...grpc.CallOption) (*IncomeExpenseSummary, error)
 }
 
 type kakeiboServiceClient struct {
@@ -255,6 +257,16 @@ func (c *kakeiboServiceClient) SetNotificationPreferences(ctx context.Context, i
 	return out, nil
 }
 
+func (c *kakeiboServiceClient) GetIncomeExpenseSummary(ctx context.Context, in *GetIncomeExpenseSummaryRequest, opts ...grpc.CallOption) (*IncomeExpenseSummary, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IncomeExpenseSummary)
+	err := c.cc.Invoke(ctx, KakeiboService_GetIncomeExpenseSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KakeiboServiceServer is the server API for KakeiboService service.
 // All implementations must embed UnimplementedKakeiboServiceServer
 // for forward compatibility.
@@ -281,6 +293,7 @@ type KakeiboServiceServer interface {
 	SetGoal(context.Context, *SetGoalInput) (*Goal, error)
 	UpdateGoal(context.Context, *UpdateGoalRequest) (*Goal, error)
 	SetNotificationPreferences(context.Context, *SetNotificationPreferencesRequest) (*User, error)
+	GetIncomeExpenseSummary(context.Context, *GetIncomeExpenseSummaryRequest) (*IncomeExpenseSummary, error)
 	mustEmbedUnimplementedKakeiboServiceServer()
 }
 
@@ -344,6 +357,9 @@ func (UnimplementedKakeiboServiceServer) UpdateGoal(context.Context, *UpdateGoal
 }
 func (UnimplementedKakeiboServiceServer) SetNotificationPreferences(context.Context, *SetNotificationPreferencesRequest) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetNotificationPreferences not implemented")
+}
+func (UnimplementedKakeiboServiceServer) GetIncomeExpenseSummary(context.Context, *GetIncomeExpenseSummaryRequest) (*IncomeExpenseSummary, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIncomeExpenseSummary not implemented")
 }
 func (UnimplementedKakeiboServiceServer) mustEmbedUnimplementedKakeiboServiceServer() {}
 func (UnimplementedKakeiboServiceServer) testEmbeddedByValue()                        {}
@@ -690,6 +706,24 @@ func _KakeiboService_SetNotificationPreferences_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KakeiboService_GetIncomeExpenseSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIncomeExpenseSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KakeiboServiceServer).GetIncomeExpenseSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KakeiboService_GetIncomeExpenseSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KakeiboServiceServer).GetIncomeExpenseSummary(ctx, req.(*GetIncomeExpenseSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KakeiboService_ServiceDesc is the grpc.ServiceDesc for KakeiboService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -768,6 +802,10 @@ var KakeiboService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetNotificationPreferences",
 			Handler:    _KakeiboService_SetNotificationPreferences_Handler,
+		},
+		{
+			MethodName: "GetIncomeExpenseSummary",
+			Handler:    _KakeiboService_GetIncomeExpenseSummary_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

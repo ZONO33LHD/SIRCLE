@@ -40,10 +40,28 @@ message DeleteTransactionResponse {
     bool success = 1;
 }
 
+message GetIncomeExpenseSummaryRequest {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message GetIncomeExpenseSummaryResponse {
+  repeated SummaryItem income_items = 1;
+  repeated SummaryItem expense_items = 2;
+  float balance = 3;
+}
+
+message SummaryItem {
+  string title = 1;
+  float amount = 2;
+}
+
 // 取引サービスの定義
 service TransactionService {
     // 取引を作成
     rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse);
     // 取引を削除
     rpc DeleteTransaction(DeleteTransactionRequest) returns (DeleteTransactionResponse);
+    // 収支集計を取得
+    rpc GetIncomeExpenseSummary(GetIncomeExpenseSummaryRequest) returns (GetIncomeExpenseSummaryResponse);
 }

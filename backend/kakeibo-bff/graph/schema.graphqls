@@ -42,8 +42,13 @@ type Mutation {
   setGoal(input: SetGoalInput!): Goal!
   # 目標を更新
   updateGoal(id: ID!, input: UpdateGoalInput!): Goal!
+  # 収支集計を取得
+  getIncomeExpenseSummary(startDate: String!, endDate: String!): IncomeExpenseSummary!
   # 通知設定を更新
-  setNotificationPreferences(userId: ID!, input: NotificationPreferencesInput!): User!
+  setNotificationPreferences(
+    userId: ID!
+    input: NotificationPreferencesInput!
+  ): User!
   # ログイン
   login(email: String!, password: String!): AuthPayload!
 }
@@ -86,6 +91,29 @@ type Category {
   id: ID!
   name: String!
   type: TransactionType!
+}
+
+type IncomeItem {
+  title: String!
+  amount: Float!
+}
+
+type ExpenseItem {
+  title: String!
+  amount: Float!
+}
+
+# 収支集計の型定義
+type IncomeExpenseSummary {
+  incomeItems: [IncomeItem!]!
+  expenseItems: [ExpenseItem!]!
+  balance: Float!
+}
+
+# 集計アイテムの型定義
+type SummaryItem {
+  title: String!
+  amount: Float!
 }
 
 # 目標情報の型定義

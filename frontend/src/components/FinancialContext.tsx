@@ -4,8 +4,8 @@ import { gql, useMutation } from '@apollo/client';
 import React, { createContext, useContext, ReactNode } from 'react';
 
 const GET_INCOME_EXPENSE_SUMMARY = gql`
-mutation GetIncomeExpenseSummary($period: String!, $date: String!) {
-  getIncomeExpenseSummary(period: $period, date: $date) {
+mutation GetIncomeExpenseSummary($startDate: String!, $endDate: String!) {
+  getIncomeExpenseSummary(startDate: $startDate, endDate: $endDate) {
     incomeItems {
       title
       amount

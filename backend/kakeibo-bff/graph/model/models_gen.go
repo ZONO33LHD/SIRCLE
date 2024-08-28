@@ -62,6 +62,11 @@ type CreateUserInput struct {
 	Password string `json:"password"`
 }
 
+type ExpenseItem struct {
+	Title  string  `json:"title"`
+	Amount float64 `json:"amount"`
+}
+
 type Goal struct {
 	ID            string  `json:"id"`
 	UserID        string  `json:"userId"`
@@ -69,6 +74,17 @@ type Goal struct {
 	TargetAmount  float64 `json:"targetAmount"`
 	CurrentAmount float64 `json:"currentAmount"`
 	Deadline      *string `json:"deadline,omitempty"`
+}
+
+type IncomeExpenseSummary struct {
+	IncomeItems  []*IncomeItem  `json:"incomeItems"`
+	ExpenseItems []*ExpenseItem `json:"expenseItems"`
+	Balance      float64        `json:"balance"`
+}
+
+type IncomeItem struct {
+	Title  string  `json:"title"`
+	Amount float64 `json:"amount"`
 }
 
 type Mutation struct {
@@ -100,6 +116,11 @@ type SetGoalInput struct {
 	Name         string  `json:"name"`
 	TargetAmount float64 `json:"targetAmount"`
 	Deadline     *string `json:"deadline,omitempty"`
+}
+
+type SummaryItem struct {
+	Title  string  `json:"title"`
+	Amount float64 `json:"amount"`
 }
 
 type Transaction struct {

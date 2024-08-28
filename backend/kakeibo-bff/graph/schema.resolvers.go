@@ -132,6 +132,56 @@ func (r *mutationResolver) UpdateGoal(ctx context.Context, id string, input mode
 	panic(fmt.Errorf("not implemented: UpdateGoal - updateGoal"))
 }
 
+// GetIncomeExpenseSummary is the resolver for the getIncomeExpenseSummary field.
+func (r *mutationResolver) GetIncomeExpenseSummary(ctx context.Context, startDate string, endDate string) (*model.IncomeExpenseSummary, error) {
+	// トランザクションサービスクライアントが初期化されていることを確認
+	if r.TransactionServiceClient == nil {
+		return nil, fmt.Errorf("TransactionServiceClient が初期化されていません")
+	}
+
+	// 日付文字列をtime.Time型に変換
+	start, err := time.Parse(time.RFC3339, startDate)
+	if err != nil {
+		return nil, fmt.Errorf("無効な開始日付: %v", err)
+	}
+	end, err := time.Parse(time.RFC3339, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("無効な終了日付: %v", err)
+	}
+
+	// トランザクションサービスに収支サマリーのリクエストを送信
+	resp, err := r.TransactionServiceClient.GetIncomeExpenseSummary(ctx, &transactionpb.GetIncomeExpenseSummaryRequest{
+		StartDate: start.Format(time.RFC3339),
+		EndDate:   end.Format(time.RFC3339),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("収支サマリーの取得に失敗しました: %v", err)
+	}
+
+	// レスポンスをGraphQLの型に変換
+	incomeItems := make([]*model.IncomeItem, len(resp.IncomeItems))
+	for i, item := range resp.IncomeItems {
+		incomeItems[i] = &model.IncomeItem{
+			Title:  item.Title,
+			Amount: float64(item.Amount),
+		}
+	}
+
+	expenseItems := make([]*model.ExpenseItem, len(resp.ExpenseItems))
+	for i, item := range resp.ExpenseItems {
+		expenseItems[i] = &model.ExpenseItem{
+			Title:  item.Title,
+			Amount: float64(item.Amount),
+		}
+	}
+
+	return &model.IncomeExpenseSummary{
+		IncomeItems:  incomeItems,
+		ExpenseItems: expenseItems,
+		Balance:      float64(resp.Balance),
+	}, nil
+}
+
 // SetNotificationPreferences is the resolver for the setNotificationPreferences field.
 func (r *mutationResolver) SetNotificationPreferences(ctx context.Context, userID string, input model.NotificationPreferencesInput) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: SetNotificationPreferences - setNotificationPreferences"))

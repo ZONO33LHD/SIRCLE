@@ -10,8 +10,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ZONO33LHD/sircle/backend/kakeibo-bff/graph"
-	pb "github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb"
 	transactionpb "github.com/ZONO33LHD/sircle/backend/kakeibo-transaction-service/pkg/grpc/pb"
+	pb "github.com/ZONO33LHD/sircle/backend/kakeibo-user-service/pkg/grpc/pb"
 	"github.com/rs/cors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"google.golang.org/grpc"
@@ -58,19 +58,43 @@ func main() {
 	// GraphQLサーバーの作成
 	es := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
 	srv := handler.NewDefaultServer(es)
+	srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
+		return func(ctx context.Context) *graphql.Response {
+			log.Printf("Received GraphQL operation: %s", graphql.GetOperationContext(ctx).RawQuery)
+			return next(ctx)(ctx)
+		}
+	})
 	srv.SetErrorPresenter(func(ctx context.Context, e error) *gqlerror.Error {
 		err := graphql.DefaultErrorPresenter(ctx, e)
-		log.Printf("GraphQL error: %v", err)
+		if err.Message == "variable.startDate must be defined" {
+			return &gqlerror.Error{
+				Message: "開始日（startDate）は必須です",
+				Path:    err.Path,
+				Extensions: map[string]interface{}{
+					"code": "BAD_USER_INPUT",
+				},
+			}
+		} else if err.Message == "variable.endDate must be defined" {
+			err.Message = "終了日を指定してください"
+			return &gqlerror.Error{
+				Message: err.Message,
+				Path:    err.Path,
+				Extensions: map[string]interface{}{
+					"code": "BAD_USER_INPUT",
+				},
+			}
+		}
 		err.Message = "内部サーバーエラーが発生しました"
 		return err
 	})
 
 	// CORSミドルウェアの設定
 	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:8080"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
+		Debug:            false,
 	})
 
 	// GraphQLサーバーのハンドラーを設定

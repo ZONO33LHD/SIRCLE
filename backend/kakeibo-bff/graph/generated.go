@@ -72,6 +72,11 @@ type ComplexityRoot struct {
 		Percentage func(childComplexity int) int
 	}
 
+	ExpenseItem struct {
+		Amount func(childComplexity int) int
+		Title  func(childComplexity int) int
+	}
+
 	Goal struct {
 		CurrentAmount func(childComplexity int) int
 		Deadline      func(childComplexity int) int
@@ -81,6 +86,17 @@ type ComplexityRoot struct {
 		UserID        func(childComplexity int) int
 	}
 
+	IncomeExpenseSummary struct {
+		Balance      func(childComplexity int) int
+		ExpenseItems func(childComplexity int) int
+		IncomeItems  func(childComplexity int) int
+	}
+
+	IncomeItem struct {
+		Amount func(childComplexity int) int
+		Title  func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateBudget               func(childComplexity int, input model.CreateBudgetInput) int
 		CreateCategory             func(childComplexity int, input model.CreateCategoryInput) int
@@ -88,6 +104,7 @@ type ComplexityRoot struct {
 		CreateUser                 func(childComplexity int, input model.CreateUserInput) int
 		DeleteCategory             func(childComplexity int, id string) int
 		DeleteTransaction          func(childComplexity int, id string) int
+		GetIncomeExpenseSummary    func(childComplexity int, startDate string, endDate string) int
 		Login                      func(childComplexity int, email string, password string) int
 		SetGoal                    func(childComplexity int, input model.SetGoalInput) int
 		SetNotificationPreferences func(childComplexity int, userID string, input model.NotificationPreferencesInput) int
@@ -117,6 +134,11 @@ type ComplexityRoot struct {
 		TotalExpense      func(childComplexity int) int
 		TotalIncome       func(childComplexity int) int
 		Trends            func(childComplexity int) int
+	}
+
+	SummaryItem struct {
+		Amount func(childComplexity int) int
+		Title  func(childComplexity int) int
 	}
 
 	Transaction struct {
@@ -160,6 +182,7 @@ type MutationResolver interface {
 	DeleteCategory(ctx context.Context, id string) (bool, error)
 	SetGoal(ctx context.Context, input model.SetGoalInput) (*model.Goal, error)
 	UpdateGoal(ctx context.Context, id string, input model.UpdateGoalInput) (*model.Goal, error)
+	GetIncomeExpenseSummary(ctx context.Context, startDate string, endDate string) (*model.IncomeExpenseSummary, error)
 	SetNotificationPreferences(ctx context.Context, userID string, input model.NotificationPreferencesInput) (*model.User, error)
 	Login(ctx context.Context, email string, password string) (*model.AuthPayload, error)
 }
@@ -281,6 +304,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CategoryBreakdown.Percentage(childComplexity), true
 
+	case "ExpenseItem.amount":
+		if e.complexity.ExpenseItem.Amount == nil {
+			break
+		}
+
+		return e.complexity.ExpenseItem.Amount(childComplexity), true
+
+	case "ExpenseItem.title":
+		if e.complexity.ExpenseItem.Title == nil {
+			break
+		}
+
+		return e.complexity.ExpenseItem.Title(childComplexity), true
+
 	case "Goal.currentAmount":
 		if e.complexity.Goal.CurrentAmount == nil {
 			break
@@ -322,6 +359,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Goal.UserID(childComplexity), true
+
+	case "IncomeExpenseSummary.balance":
+		if e.complexity.IncomeExpenseSummary.Balance == nil {
+			break
+		}
+
+		return e.complexity.IncomeExpenseSummary.Balance(childComplexity), true
+
+	case "IncomeExpenseSummary.expenseItems":
+		if e.complexity.IncomeExpenseSummary.ExpenseItems == nil {
+			break
+		}
+
+		return e.complexity.IncomeExpenseSummary.ExpenseItems(childComplexity), true
+
+	case "IncomeExpenseSummary.incomeItems":
+		if e.complexity.IncomeExpenseSummary.IncomeItems == nil {
+			break
+		}
+
+		return e.complexity.IncomeExpenseSummary.IncomeItems(childComplexity), true
+
+	case "IncomeItem.amount":
+		if e.complexity.IncomeItem.Amount == nil {
+			break
+		}
+
+		return e.complexity.IncomeItem.Amount(childComplexity), true
+
+	case "IncomeItem.title":
+		if e.complexity.IncomeItem.Title == nil {
+			break
+		}
+
+		return e.complexity.IncomeItem.Title(childComplexity), true
 
 	case "Mutation.createBudget":
 		if e.complexity.Mutation.CreateBudget == nil {
@@ -394,6 +466,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteTransaction(childComplexity, args["id"].(string)), true
+
+	case "Mutation.getIncomeExpenseSummary":
+		if e.complexity.Mutation.GetIncomeExpenseSummary == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_getIncomeExpenseSummary_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.GetIncomeExpenseSummary(childComplexity, args["startDate"].(string), args["endDate"].(string)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -594,6 +678,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Report.Trends(childComplexity), true
+
+	case "SummaryItem.amount":
+		if e.complexity.SummaryItem.Amount == nil {
+			break
+		}
+
+		return e.complexity.SummaryItem.Amount(childComplexity), true
+
+	case "SummaryItem.title":
+		if e.complexity.SummaryItem.Title == nil {
+			break
+		}
+
+		return e.complexity.SummaryItem.Title(childComplexity), true
 
 	case "Transaction.amount":
 		if e.complexity.Transaction.Amount == nil {
@@ -944,6 +1042,30 @@ func (ec *executionContext) field_Mutation_deleteTransaction_args(ctx context.Co
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_getIncomeExpenseSummary_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["startDate"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startDate"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["startDate"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["endDate"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["endDate"] = arg1
 	return args, nil
 }
 
@@ -1874,6 +1996,94 @@ func (ec *executionContext) fieldContext_CategoryBreakdown_percentage(_ context.
 	return fc, nil
 }
 
+func (ec *executionContext) _ExpenseItem_title(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExpenseItem_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExpenseItem_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExpenseItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExpenseItem_amount(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExpenseItem_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExpenseItem_amount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExpenseItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Goal_id(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Goal_id(ctx, field)
 	if err != nil {
@@ -2130,6 +2340,238 @@ func (ec *executionContext) fieldContext_Goal_deadline(_ context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _IncomeExpenseSummary_incomeItems(ctx context.Context, field graphql.CollectedField, obj *model.IncomeExpenseSummary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_IncomeExpenseSummary_incomeItems(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IncomeItems, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.IncomeItem)
+	fc.Result = res
+	return ec.marshalNIncomeItem2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐIncomeItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_IncomeExpenseSummary_incomeItems(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IncomeExpenseSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_IncomeItem_title(ctx, field)
+			case "amount":
+				return ec.fieldContext_IncomeItem_amount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type IncomeItem", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _IncomeExpenseSummary_expenseItems(ctx context.Context, field graphql.CollectedField, obj *model.IncomeExpenseSummary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_IncomeExpenseSummary_expenseItems(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpenseItems, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ExpenseItem)
+	fc.Result = res
+	return ec.marshalNExpenseItem2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐExpenseItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_IncomeExpenseSummary_expenseItems(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IncomeExpenseSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ExpenseItem_title(ctx, field)
+			case "amount":
+				return ec.fieldContext_ExpenseItem_amount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExpenseItem", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _IncomeExpenseSummary_balance(ctx context.Context, field graphql.CollectedField, obj *model.IncomeExpenseSummary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_IncomeExpenseSummary_balance(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Balance, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_IncomeExpenseSummary_balance(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IncomeExpenseSummary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _IncomeItem_title(ctx context.Context, field graphql.CollectedField, obj *model.IncomeItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_IncomeItem_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_IncomeItem_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IncomeItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _IncomeItem_amount(ctx context.Context, field graphql.CollectedField, obj *model.IncomeItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_IncomeItem_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_IncomeItem_amount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IncomeItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2929,6 +3371,69 @@ func (ec *executionContext) fieldContext_Mutation_updateGoal(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateGoal_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_getIncomeExpenseSummary(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_getIncomeExpenseSummary(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().GetIncomeExpenseSummary(rctx, fc.Args["startDate"].(string), fc.Args["endDate"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.IncomeExpenseSummary)
+	fc.Result = res
+	return ec.marshalNIncomeExpenseSummary2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐIncomeExpenseSummary(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_getIncomeExpenseSummary(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "incomeItems":
+				return ec.fieldContext_IncomeExpenseSummary_incomeItems(ctx, field)
+			case "expenseItems":
+				return ec.fieldContext_IncomeExpenseSummary_expenseItems(ctx, field)
+			case "balance":
+				return ec.fieldContext_IncomeExpenseSummary_balance(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type IncomeExpenseSummary", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_getIncomeExpenseSummary_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3839,6 +4344,94 @@ func (ec *executionContext) fieldContext_Report_trends(_ context.Context, field 
 				return ec.fieldContext_TrendPoint_amount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TrendPoint", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SummaryItem_title(ctx context.Context, field graphql.CollectedField, obj *model.SummaryItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SummaryItem_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SummaryItem_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SummaryItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SummaryItem_amount(ctx context.Context, field graphql.CollectedField, obj *model.SummaryItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SummaryItem_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SummaryItem_amount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SummaryItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7227,6 +7820,50 @@ func (ec *executionContext) _CategoryBreakdown(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var expenseItemImplementors = []string{"ExpenseItem"}
+
+func (ec *executionContext) _ExpenseItem(ctx context.Context, sel ast.SelectionSet, obj *model.ExpenseItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, expenseItemImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ExpenseItem")
+		case "title":
+			out.Values[i] = ec._ExpenseItem_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "amount":
+			out.Values[i] = ec._ExpenseItem_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var goalImplementors = []string{"Goal"}
 
 func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj *model.Goal) graphql.Marshaler {
@@ -7265,6 +7902,99 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "deadline":
 			out.Values[i] = ec._Goal_deadline(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var incomeExpenseSummaryImplementors = []string{"IncomeExpenseSummary"}
+
+func (ec *executionContext) _IncomeExpenseSummary(ctx context.Context, sel ast.SelectionSet, obj *model.IncomeExpenseSummary) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, incomeExpenseSummaryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("IncomeExpenseSummary")
+		case "incomeItems":
+			out.Values[i] = ec._IncomeExpenseSummary_incomeItems(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "expenseItems":
+			out.Values[i] = ec._IncomeExpenseSummary_expenseItems(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "balance":
+			out.Values[i] = ec._IncomeExpenseSummary_balance(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var incomeItemImplementors = []string{"IncomeItem"}
+
+func (ec *executionContext) _IncomeItem(ctx context.Context, sel ast.SelectionSet, obj *model.IncomeItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, incomeItemImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("IncomeItem")
+		case "title":
+			out.Values[i] = ec._IncomeItem_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "amount":
+			out.Values[i] = ec._IncomeItem_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7387,6 +8117,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "updateGoal":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateGoal(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "getIncomeExpenseSummary":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_getIncomeExpenseSummary(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -7659,6 +8396,50 @@ func (ec *executionContext) _Report(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "trends":
 			out.Values[i] = ec._Report_trends(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var summaryItemImplementors = []string{"SummaryItem"}
+
+func (ec *executionContext) _SummaryItem(ctx context.Context, sel ast.SelectionSet, obj *model.SummaryItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, summaryItemImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SummaryItem")
+		case "title":
+			out.Values[i] = ec._SummaryItem_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "amount":
+			out.Values[i] = ec._SummaryItem_amount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -8446,6 +9227,60 @@ func (ec *executionContext) marshalNDateTime2string(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalNExpenseItem2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐExpenseItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ExpenseItem) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNExpenseItem2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐExpenseItem(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNExpenseItem2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐExpenseItem(ctx context.Context, sel ast.SelectionSet, v *model.ExpenseItem) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ExpenseItem(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
 	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -8532,6 +9367,74 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNIncomeExpenseSummary2githubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐIncomeExpenseSummary(ctx context.Context, sel ast.SelectionSet, v model.IncomeExpenseSummary) graphql.Marshaler {
+	return ec._IncomeExpenseSummary(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNIncomeExpenseSummary2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐIncomeExpenseSummary(ctx context.Context, sel ast.SelectionSet, v *model.IncomeExpenseSummary) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._IncomeExpenseSummary(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNIncomeItem2ᚕᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐIncomeItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.IncomeItem) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNIncomeItem2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐIncomeItem(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNIncomeItem2ᚖgithubᚗcomᚋZONO33LHDᚋsircleᚋbackendᚋkakeiboᚑbffᚋgraphᚋmodelᚐIncomeItem(ctx context.Context, sel ast.SelectionSet, v *model.IncomeItem) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._IncomeItem(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
