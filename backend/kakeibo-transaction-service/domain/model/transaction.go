@@ -15,3 +15,14 @@ type Transaction struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type IncomeExpenseSummary struct {
+    IncomeItems  []*SummaryItem
+    ExpenseItems []*SummaryItem
+    Balance      float64
+}
+
+type SummaryItem struct {
+    Title  string
+    Amount float64
+}

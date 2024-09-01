@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -60,32 +63,38 @@ func main() {
 	srv := handler.NewDefaultServer(es)
 	srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
 		return func(ctx context.Context) *graphql.Response {
-			log.Printf("Received GraphQL operation: %s", graphql.GetOperationContext(ctx).RawQuery)
-			return next(ctx)(ctx)
+			log.Printf("AroundOperations: Context received")
+			if ctx == nil {
+				log.Printf("AroundOperations: Context is nil, creating new context")
+				ctx = context.Background()
+			}
+			oc := graphql.GetOperationContext(ctx)
+			if oc == nil {
+				log.Printf("AroundOperations: OperationContext is nil, cannot proceed")
+				return &graphql.Response{Errors: gqlerror.List{{Message: "OperationContextがnilです"}}}
+			}
+			log.Printf("Received GraphQL operation: %s", oc.RawQuery)
+			resp := next(ctx)
+			return resp(ctx)
 		}
 	})
 	srv.SetErrorPresenter(func(ctx context.Context, e error) *gqlerror.Error {
+		log.Printf("Error Presenter: Received error: %v", e)
 		err := graphql.DefaultErrorPresenter(ctx, e)
-		if err.Message == "variable.startDate must be defined" {
-			return &gqlerror.Error{
-				Message: "開始日（startDate）は必須です",
-				Path:    err.Path,
-				Extensions: map[string]interface{}{
-					"code": "BAD_USER_INPUT",
-				},
-			}
-		} else if err.Message == "variable.endDate must be defined" {
-			err.Message = "終了日を指定してください"
-			return &gqlerror.Error{
-				Message: err.Message,
-				Path:    err.Path,
-				Extensions: map[string]interface{}{
-					"code": "BAD_USER_INPUT",
-				},
-			}
+		log.Printf("Detailed error: %+v", err)
+
+		return &gqlerror.Error{
+			Message: fmt.Sprintf("エラーが発生しました: %s", err.Message),
+			Path:    err.Path,
+			Extensions: map[string]interface{}{
+				"code": "INTERNAL_SERVER_ERROR",
+			},
 		}
-		err.Message = "内部サーバーエラーが発生しました"
-		return err
+	})
+
+	srv.SetRecoverFunc(func(ctx context.Context, err interface{}) error {
+		log.Printf("Panic occurred: %v", err)
+		return fmt.Errorf("内部サーバーエラーが発生しました: %v", err)
 	})
 
 	// CORSミドルウェアの設定
@@ -99,7 +108,15 @@ func main() {
 
 	// GraphQLサーバーのハンドラーを設定
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", corsMiddleware.Handler(srv))
+	http.HandleFunc("/query", func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		log.Printf("Body: %s", string(body))
+		r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		ctx := r.Context()
+		ctx = graphql.WithOperationContext(ctx, &graphql.OperationContext{})
+		r = r.WithContext(ctx)
+		corsMiddleware.Handler(srv).ServeHTTP(w, r)
+	})
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

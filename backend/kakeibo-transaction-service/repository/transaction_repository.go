@@ -16,4 +16,5 @@ type TransactionRepository interface {
 	GetTransactionsByCategoryId(ctx context.Context, categoryId string) ([]*model.Transaction, error)
 	GetTransactionsByDateRange(ctx context.Context, startDate time.Time, endDate time.Time) ([]*model.Transaction, error)
 	GetTransactionsByType(ctx context.Context, transactionType string) ([]*model.Transaction, error)
+    GetIncomeExpenseSummary(ctx context.Context, startDate time.Time, endDate time.Time) (*model.IncomeExpenseSummary, error)
 }

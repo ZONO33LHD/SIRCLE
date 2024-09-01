@@ -1,22 +1,23 @@
 'use client';
 
-import { gql, useMutation } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import React, { createContext, useContext, ReactNode } from 'react';
+import { format } from 'date-fns';
 
-const GET_INCOME_EXPENSE_SUMMARY = gql`
-mutation GetIncomeExpenseSummary($startDate: String!, $endDate: String!) {
-  getIncomeExpenseSummary(startDate: $startDate, endDate: $endDate) {
-    incomeItems {
-      title
-      amount
+export const GET_INCOME_EXPENSE_SUMMARY = gql`
+  query GetIncomeExpenseSummary($startDate: String!, $endDate: String!) {
+    getIncomeExpenseSummary(startDate: $startDate, endDate: $endDate) {
+      incomeItems {
+        title
+        amount
+      }
+      expenseItems {
+        title
+        amount
+      }
+      balance
     }
-    expenseItems {
-      title
-      amount
-    }
-    balance
   }
-}
 `;
 
 type SummaryItemProps = {
@@ -47,30 +48,55 @@ type FinancialProviderProps = {
 };
 
 export const FinancialProvider: React.FC<FinancialProviderProps> = ({ children }) => {
-  const [getIncomeExpenseSummary] = useMutation(GET_INCOME_EXPENSE_SUMMARY);
+  const { refetch: getIncomeExpenseSummaryQuery } = useQuery(GET_INCOME_EXPENSE_SUMMARY, {
+    skip: true,
+    variables: {
+      startDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+    },
+  });
 
   const getFinancialDataForPeriod = async (range: DateRange): Promise<FinancialData> => {
     try {
-      const { data } = await getIncomeExpenseSummary({
+      const formattedStartDate = format(range.startDate, "yyyy-MM-dd'T'00:00:00+09:00");
+      const formattedEndDate = format(range.endDate, "yyyy-MM-dd'T'23:59:59+09:00");
+      console.log('Sending query with variables:', {
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+      });
+      const { data } = await getIncomeExpenseSummaryQuery({
         variables: {
-          period: 'custom',
-          date: range.endDate.toISOString(),
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
         },
       });
       if (data && data.getIncomeExpenseSummary) {
-        return data.getIncomeExpenseSummary;
+        return {
+          incomeItems: data.getIncomeExpenseSummary.incomeItems.map((item: any) => ({
+            title: item.title,
+            amount: `${item.amount}円`,
+          })),
+          expenseItems: data.getIncomeExpenseSummary.expenseItems.map((item: any) => ({
+            title: item.title,
+            amount: `${item.amount}円`,
+          })),
+          balance: `${data.getIncomeExpenseSummary.balance}円`,
+        };
       }
+      throw new Error('データが取得できませんでした');
     } catch (error) {
       console.error('データの取得に失敗しました:', error);
+      throw error;
     }
-    return { incomeItems: [], expenseItems: [], balance: '0円' };
   };
 
   return (
-    <FinancialContext.Provider value={{
-      getFinancialDataForPeriod,
-      updateFinancialData: () => {},
-    }}>
+    <FinancialContext.Provider
+      value={{
+        getFinancialDataForPeriod,
+        updateFinancialData: () => {},
+      }}
+    >
       {children}
     </FinancialContext.Provider>
   );

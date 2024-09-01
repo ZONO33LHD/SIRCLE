@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useFinancial } from './FinancialContext';
 import { Calendar } from '@/components/ui/calendar';
 import { format, differenceInDays, differenceInMonths, differenceInYears } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useFinancial } from './FinancialContext';
 
 type SummaryItemProps = {
   title: string;
@@ -30,8 +30,9 @@ const SummaryRow = ({ category, items }: { category: string; items: SummaryItemP
 );
 
 export default function IncomeExpenseSummary() {
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const currentYear = new Date().getFullYear();
+  const [startDate, setStartDate] = useState<Date>(new Date(currentYear, 0, 1));
+  const [endDate, setEndDate] = useState<Date>(new Date(currentYear, 11, 31));
   const [isStartDateOpen, setIsStartDateOpen] = useState(false);
   const [isEndDateOpen, setIsEndDateOpen] = useState(false);
   const [periodData, setPeriodData] = useState<{
@@ -43,8 +44,15 @@ export default function IncomeExpenseSummary() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getFinancialDataForPeriod({ startDate, endDate });
-      setPeriodData(data);
+      try {
+        const data = await getFinancialDataForPeriod({
+          startDate: startDate,
+          endDate: endDate
+        });
+        setPeriodData(data);
+      } catch (error) {
+        console.error('データの取得に失敗しました:', error);
+      }
     };
     fetchData();
   }, [startDate, endDate, getFinancialDataForPeriod]);

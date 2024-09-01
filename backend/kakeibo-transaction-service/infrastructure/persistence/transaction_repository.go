@@ -98,3 +98,66 @@ func (r *TransactionRepositoryImpl) DeleteTransaction(ctx context.Context, id st
 	return err
 }
 
+func (r *TransactionRepositoryImpl) GetIncomeExpenseSummary(ctx context.Context, startDate, endDate time.Time) (*model.IncomeExpenseSummary, error) {
+    query := `
+        SELECT 
+            COALESCE(SUM(CASE WHEN type = 'INCOME' THEN amount ELSE 0 END), 0) as total_income,
+            COALESCE(SUM(CASE WHEN type = 'EXPENSE' THEN amount ELSE 0 END), 0) as total_expense,
+            COALESCE(SUM(CASE WHEN type = 'INCOME' THEN amount ELSE -amount END), 0) as balance,
+            type,
+            category_id,
+            (SELECT name FROM categories WHERE id = transactions.category_id) as category_name,
+            SUM(amount) as category_amount
+        FROM transactions
+        WHERE date BETWEEN $1 AND $2
+        GROUP BY type, category_id
+    `
+
+    rows, err := r.db.QueryContext(ctx, query, startDate, endDate)
+    if err != nil {
+        return nil, fmt.Errorf("クエリの実行中にエラーが発生しました: %v", err)
+    }
+    defer rows.Close()
+
+    summary := &model.IncomeExpenseSummary{
+        IncomeItems:  make([]*model.SummaryItem, 0),
+        ExpenseItems: make([]*model.SummaryItem, 0),
+    }
+
+    for rows.Next() {
+        var (
+            totalIncome    float64
+            totalExpense   float64
+            balance        float64
+            transactionType string
+            categoryID     int
+            categoryName   string
+            categoryAmount float64
+        )
+
+        err := rows.Scan(&totalIncome, &totalExpense, &balance, &transactionType, &categoryID, &categoryName, &categoryAmount)
+        if err != nil {
+            return nil, fmt.Errorf("行のスキャン中にエラーが発生しました: %v", err)
+        }
+
+        summary.Balance = balance
+
+        item := &model.SummaryItem{
+            Title:  categoryName,
+            Amount: categoryAmount,
+        }
+
+        if transactionType == "INCOME" {
+            summary.IncomeItems = append(summary.IncomeItems, item)
+        } else {
+            summary.ExpenseItems = append(summary.ExpenseItems, item)
+        }
+    }
+
+    if err := rows.Err(); err != nil {
+        return nil, fmt.Errorf("行の反復中にエラーが発生しました: %v", err)
+    }
+
+    return summary, nil
+}
+
